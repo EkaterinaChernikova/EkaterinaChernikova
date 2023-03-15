@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace HomeWork_1
+namespace ConsoleApp1
 {
     class Program
     {
         static void Main(string[] args)
         {
+            const string Command_Addperson = "1";
+            const string Command_PrintInfo = "2";
+            const string Command_RemovePerson = "3";
+            const string Command_Exit = "4";
+
             Dictionary<string, string> personalList = new Dictionary<string, string>();
             string userInput;
             bool isExit = false;
@@ -16,26 +20,30 @@ namespace HomeWork_1
             {
                 Console.Clear();
                 Console.WriteLine(
-               "1. Добавить досье\n" +
-               "2. Вывести все досье\n" +
-               "3. Удалить досье\n" +
-               "4. Выход\n"
+               $"{Command_Addperson}. Добавить досье\n" +
+               $"{Command_PrintInfo}. Вывести все досье\n" +
+               $"{Command_RemovePerson}. Удалить досье\n" +
+               $"{Command_Exit}. Выход\n"
                );
                 Console.Write("Введите номер меню: ");
 
                 userInput = Console.ReadLine();
+
                 switch (userInput)
                 {
-                    case "1":
+                    case Command_Addperson:
                         AddPerson(personalList);
                         break;
-                    case "2":
+
+                    case Command_PrintInfo:
                         PrintInfo(personalList);
                         break;
-                    case "3":
-                        RemowePerson(personalList);
+
+                    case Command_RemovePerson:
+                        RemovePerson(personalList);
                         break;
-                    case "4":
+
+                    case Command_Exit:
                         isExit = true;
                         break;
                 }
@@ -58,7 +66,7 @@ namespace HomeWork_1
             Console.Write("\nВведите должность: ");
             post = Console.ReadLine();
 
-            if(personalList.ContainsKey(lastName + " " + firstName + " " + secondName) == false)
+            if (personalList.ContainsKey(lastName + " " + firstName + " " + secondName) == false)
             {
                 personalList.Add(lastName + " " + firstName + " " + secondName, post);
             }
@@ -71,7 +79,7 @@ namespace HomeWork_1
 
         static void PrintInfo(Dictionary<string, string> personalList)
         {
-            if (IsEmpty(personalList.Count) == false)
+            if (personalList.Count == 0)
                 return;
 
             int count = 1;
@@ -81,12 +89,13 @@ namespace HomeWork_1
                 Console.WriteLine($"{count} - {person.Key} - {person.Value}");
                 count++;
             }
+
             Console.ReadLine();
         }
 
-        static void RemowePerson(Dictionary<string, string> personalList)
+        static void RemovePerson(Dictionary<string, string> personalList)
         {
-            if (IsEmpty(personalList.Count) == false)
+            if (personalList.Count == 0)
                 return;
 
             Console.Write("Введите ФИО из списка для удаления: ");
@@ -101,17 +110,6 @@ namespace HomeWork_1
                 Console.WriteLine("\nТакого сотрудника не найдено.");
                 Console.ReadKey();
             }
-        }
-
-        static bool IsEmpty(int listSize)
-        {
-            if (listSize == 0)
-            {
-                Console.WriteLine("Список пуст.");
-                Console.ReadKey();
-                return false;
-            }
-            return true;
         }
     }
 }
