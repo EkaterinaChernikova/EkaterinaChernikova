@@ -7,38 +7,51 @@ namespace HomeWork_1
     {
         static void Main(string[] args)
         {
+            const string Command_Sum = "sum";
+            const string Command_Exit = "exit";
+
             List<int> numbers = new List<int>();
             string userInput;
             int sum = 0;
-            int userNumber = 0;
             bool isExit = false;
 
-            while(isExit == false)
+            while (isExit == false)
             {
                 userInput = Console.ReadLine();
 
-                if(userInput == "sum" && numbers.Count > 0)
+                if (userInput == Command_Sum && numbers.Count > 0)
                 {
-                    foreach(var number in numbers)
-                    {
-                        sum += number;
-                    }
-
+                    sum = CalculateSum(numbers);
                     Console.WriteLine("Сумма чисел: " + sum);
-                    sum = 0;
                 }
-
-                if(userInput == "exit")
+                else if (userInput == Command_Exit)
                 {
                     isExit = true;
                     continue;
                 }
-
-                if (int.TryParse(userInput, out userNumber))
+                else
                 {
-                    numbers.Add(userNumber);
+                    AddNumber(userInput, numbers);
                 }
             }
+        }
+        static int CalculateSum(List<int> numbers)
+        {
+            int sum = 0;
+
+            foreach(var number in numbers)
+            {
+                sum += number;
+            }
+
+            return sum;
+        }
+
+        static void AddNumber(string userInput, List<int> numbers)
+        {
+            int userNumber = 0;
+            int.TryParse(userInput, out userNumber);
+            numbers.Add(userNumber);
         }
     }
 }
