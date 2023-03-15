@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeWork_1
 {
@@ -9,8 +6,9 @@ namespace HomeWork_1
     {
         static void Main(string[] args)
         {
+            Drawer drawer = new Drawer();
             Player player = new Player(25, 15);
-            Drawer.DrawPlayer(player);
+            drawer.DrawPlayer(player);
             Console.ReadKey();
         }
     }
@@ -18,14 +16,15 @@ namespace HomeWork_1
     class Player
     {
         private char _symbol = '@';
-        public int PositionX { get; private set; }
-        public int PositionY { get; private set; }
 
         public Player(int positionX, int positionY)
         {
             PositionX = positionX;
             PositionY = positionY;
         }
+
+        public int PositionX { get; private set; }
+        public int PositionY { get; private set; }
 
         public char GetPlayerSymbol()
         {
@@ -35,7 +34,7 @@ namespace HomeWork_1
 
     class Drawer
     {
-        public static void DrawPlayer(Player player)
+        public void DrawPlayer(Player player)
         {
             Console.SetCursorPosition(player.PositionX, player.PositionY);
             Console.Write(player.GetPlayerSymbol());
