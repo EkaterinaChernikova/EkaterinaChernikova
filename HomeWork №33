@@ -21,9 +21,14 @@ namespace HomeWork_1
             dictionary.Add("Эстет", "Человек, который различает прекрасное и безобразное, видит красивое в жизни, искусстве, окружающем мире, живёт и творит по законам красоты.");
             dictionary.Add("Экстраверт", "Человек, обращенный вовне, открытый миру, направленный к людям. ");
 
-            Console.Write("Введите слово, чтобы узнать его значение. " +
-                "\nСписок слов: \nВиртуоз \nГурман \nДжентльмен \nИнтроверт \nЛицедей \nПедант \nПерфекционист \nСомелье \nЭстет \nЭкстраверт " +
-                "\nВаш выбор: ");
+            Console.Write("Введите слово, чтобы узнать его значение. " + "\nСписок слов: \n");
+
+            foreach(string word in dictionary.Keys)
+            {
+                Console.WriteLine(word);
+            }
+
+            Console.Write("\nВаш выбор: ");
 
             SearchDescriptoin(dictionary);
 
@@ -34,7 +39,7 @@ namespace HomeWork_1
         {
             string userInput = Console.ReadLine();
 
-            if(dictionary.ContainsKey(userInput) == true)
+            if (dictionary.ContainsKey(userInput))
             {
                 Console.WriteLine($"Слово - {userInput} означает - {dictionary[userInput]}");
             }
