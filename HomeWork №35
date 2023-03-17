@@ -7,8 +7,8 @@ namespace HomeWork_1
     {
         static void Main(string[] args)
         {
-            const string Command_Sum = "sum";
-            const string Command_Exit = "exit";
+            const string CommandSum = "sum";
+            const string CommandExit = "exit";
 
             List<int> numbers = new List<int>();
             string userInput;
@@ -19,15 +19,14 @@ namespace HomeWork_1
             {
                 userInput = Console.ReadLine();
 
-                if (userInput == Command_Sum && numbers.Count > 0)
+                if (userInput == CommandSum && numbers.Count > 0)
                 {
                     sum = CalculateSum(numbers);
                     Console.WriteLine("Сумма чисел: " + sum);
                 }
-                else if (userInput == Command_Exit)
+                else if (userInput == CommandExit)
                 {
                     isExit = true;
-                    continue;
                 }
                 else
                 {
@@ -35,11 +34,12 @@ namespace HomeWork_1
                 }
             }
         }
+
         static int CalculateSum(List<int> numbers)
         {
             int sum = 0;
 
-            foreach(var number in numbers)
+            foreach (var number in numbers)
             {
                 sum += number;
             }
