@@ -12,11 +12,12 @@ namespace HomeWork_1
 
             List<int> numbers = new List<int>();
             string userInput;
-            int sum = 0;
-            bool isExit = false;
+            bool isRunning = false;
+            Console.Write("Введите числа, которые хотите сложить. После введите слово sum: \n");
 
-            while (isExit == false)
+            while (isRunning == false)
             {
+                int sum = 0;
                 userInput = Console.ReadLine();
 
                 if (userInput == CommandSum && numbers.Count > 0)
@@ -26,7 +27,7 @@ namespace HomeWork_1
                 }
                 else if (userInput == CommandExit)
                 {
-                    isExit = true;
+                    isRunning = true;
                 }
                 else
                 {
@@ -50,8 +51,15 @@ namespace HomeWork_1
         static void AddNumber(string userInput, List<int> numbers)
         {
             int userNumber = 0;
-            int.TryParse(userInput, out userNumber);
-            numbers.Add(userNumber);
+
+            if (int.TryParse(userInput, out userNumber))
+            {
+                numbers.Add(userNumber);
+            }
+            else
+            {
+                Console.WriteLine("\nНе верное значение. Попробуйте ввести числа еще раз.");
+            }
         }
     }
 }
