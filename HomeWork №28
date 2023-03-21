@@ -45,7 +45,7 @@ namespace HomeWork
                         break;
 
                     case CommandSearch:
-                        Search(fullNames, posts);
+                        SearchLastName(fullNames, posts);
                         break;
 
                     case CommandExit:
@@ -66,9 +66,9 @@ namespace HomeWork
             Console.Write("\nВведите имя: ");
             firstName = Console.ReadLine();
             Console.Write("\nВведите фамилию: ");
-            secondName = Console.ReadLine();
-            Console.Write("\nВведите отчество: ");
             lastName = Console.ReadLine();
+            Console.Write("\nВведите отчество: ");
+            secondName = Console.ReadLine();
             Console.Write("\nВведите должность: ");
             post = Console.ReadLine();
 
@@ -81,10 +81,17 @@ namespace HomeWork
         static void PrintInfo(string[] fullNames, string[] posts)
         {
             if (IsEmpty(fullNames.Length) == false)
+            {
                 return;
+            }
+
+            int stringNumber;
 
             for (int i = 0; i < fullNames.Length; i++)
-                Console.WriteLine($"{i + 1} - {fullNames[i]} - {posts[i]}");
+            {
+                stringNumber = i + 1;
+                Console.WriteLine($"{stringNumber} - {fullNames[i]} - {posts[i]}");
+            }
 
             Console.ReadLine();
         }
@@ -92,37 +99,54 @@ namespace HomeWork
         static void RemowePerson(ref string[] fullNames, ref string[] posts)
         {
             if (IsEmpty(fullNames.Length) == false)
+            {
                 return;
+            }
 
             Console.Write("Введите порядковый номер из списка для удаления: ");
-            int index = Convert.ToInt32(Console.ReadLine()) - 1;
+            int index = 0;
+            int.TryParse(Console.ReadLine(), out index);
+            index--;
 
             if (index >= 0 && index <= fullNames.Length)
             {
                 fullNames = DecreaseSize(fullNames, index);
                 posts = DecreaseSize(posts, index);
             }
+            else 
+            {
+                Console.WriteLine("Ошибка ввода id");
+                Console.ReadKey();
+            }
         }
 
-        static void Search(string[] fullNames, string[] posts)
+        static void SearchLastName(string[] lastName, string[] posts)
         {
-            if (IsEmpty(fullNames.Length) == false)
+            if (IsEmpty(lastName.Length) == false)
                 return;
 
             Console.Write("Введите фамилию для поиска: ");
             string userInput = Console.ReadLine();
             string[] splitString;
+            int stringNumber;
             char separator = ' ';
+            bool isFind = false;
 
-            for (int i = 0; i < fullNames.Length; i++)
+            for (int i = 0; i < lastName.Length; i++)
             {
-                splitString = fullNames[i].Split(separator);
+                splitString = lastName[i].Split(separator);
 
                 if (splitString[0] == userInput)
                 {
-                    Console.WriteLine($"{i + 1} - {fullNames[i]} - {posts[i]}");
-                    break;
+                    isFind = true;
+                    stringNumber = i + 1;
+                    Console.WriteLine($"{stringNumber} - {lastName[i]} - {posts[i]}");
                 }
+            }
+
+            if (isFind == false)
+            {
+                Console.WriteLine("\nДанной фамилии не найдено. Попробуйте еще раз.");
             }
 
             Console.ReadKey();
