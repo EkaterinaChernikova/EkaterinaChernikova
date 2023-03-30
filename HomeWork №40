@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeWork_1
 {
@@ -9,7 +7,13 @@ namespace HomeWork_1
     {
         static void Main(string[] args)
         {
-            DataBase dataBase = new DataBase();
+            const string Command_AddPlayer = "1";
+            const string Command_RemovePlayer = "2";
+            const string Command_BanPlayer = "3";
+            const string Command_UnbanPlayer = "4";
+            const string Command_Exit = "5";
+
+            Database database = new Database();
             bool isExit = false;
             string userInput;
             int totalId = 100;
@@ -17,25 +21,35 @@ namespace HomeWork_1
             while (isExit == false)
             {
                 Console.WriteLine("Список игроков: ");
-                dataBase.ShowList();
-                Console.Write("\n1 - Добавить игрока. \n2 - Удалить игрока. \n3 - Забанить игрока. \n4 - Разбанить игрока. \n5 - Выход. \n\nВаш ввод: ");
+                database.ShowList();
+                Console.Write(
+                    $"\n{Command_AddPlayer} - Добавить игрока. " +
+                    $"\n{Command_RemovePlayer} - Удалить игрока. " +
+                    $"\n{Command_BanPlayer} - Забанить игрока. " +
+                    $"\n{Command_UnbanPlayer} - Разбанить игрока. " +
+                    $"\n{Command_Exit} - Выход. " +
+                    $"\n\nВаш ввод: ");
                 userInput = Console.ReadLine();
 
                 switch (userInput)
                 {
-                    case "1":
-                        dataBase.AddPlayer(totalId++);
+                    case Command_AddPlayer:
+                        database.AddPlayer(totalId++);
                         break;
-                    case "2":
-                        dataBase.RemovePlayer();
+
+                    case Command_RemovePlayer:
+                        database.RemovePlayer();
                         break;
-                    case "3":
-                        dataBase.BanPlayer();
+
+                    case Command_BanPlayer:
+                        database.BanPlayer();
                         break;
-                    case "4":
-                        dataBase.UnBanPlayer();
+
+                    case Command_UnbanPlayer:
+                        database.UnbanPlayer();
                         break;
-                    case "5":
+
+                    case Command_Exit:
                         isExit = true;
                         break;
                 }
@@ -47,7 +61,6 @@ namespace HomeWork_1
 
     class Player
     {
-        public int _id { get; private set; }
         private string _nickName;
         private int _level;
         private bool _isBanned;
@@ -56,12 +69,14 @@ namespace HomeWork_1
         {
             _nickName = nickName;
             _level = level;
-            _id = id;
+            Id = id;
         }
+
+        public int Id { get; private set; }
 
         public void ShowInfo()
         {
-            Console.WriteLine($"Игрок - {_nickName} {_level} lv  \nУникальный номер - {_id}");
+            Console.WriteLine($"Игрок - {_nickName} {_level} lv  \nУникальный номер - {Id}");
 
             if (_isBanned)
             {
@@ -78,13 +93,13 @@ namespace HomeWork_1
             _isBanned = true;
         }
 
-        public void UnBan()
+        public void Unban()
         {
             _isBanned = false;
         }
     }
 
-    class DataBase
+    class Database
     {
         private List<Player> _players = new List<Player>();
 
@@ -92,20 +107,30 @@ namespace HomeWork_1
         {
             Console.Write("Введите ник - ");
             string nickName = Console.ReadLine();
-            Console.Write("Укажите уровень -");
-            int level = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Укажите уровень - ");
+            int level;
+            
+            while(int.TryParse(Console.ReadLine(), out level) == false)
+            {
+                Console.WriteLine("Неверный ввод.");
+            }
+
             _players.Add(new Player(nickName, level, id));
         }
 
         public void RemovePlayer()
         {
             Console.Write("Введите id для удаления: ");
-            _players.Remove(Search(Convert.ToInt32(Console.ReadLine())));
+
+            if (TryGetPlayer(out Player player) == true)
+            {
+                _players.Remove(player);
+            }
         }
 
         public void ShowList()
         {
-            if (GetIsEmpty() == false)
+            if (_players.Count > 0)
             {
                 foreach (var player in _players)
                 {
@@ -121,32 +146,42 @@ namespace HomeWork_1
         public void BanPlayer()
         {
             Console.Write("Введите id чтобы забанить: ");
-            Search(Convert.ToInt32(Console.ReadLine())).Ban();
+
+            if (TryGetPlayer(out Player player) == true)
+            {
+                player.Ban();
+            }
         }
 
-        public void UnBanPlayer()
+        public void UnbanPlayer()
         {
             Console.Write("Введите id чтобы разбанить: ");
-            Search(Convert.ToInt32(Console.ReadLine())).UnBan();
-        }
 
-        private bool GetIsEmpty()
-        {
-            return _players.Count == 0;
-        }
-
-        private Player Search(int id)
-        {
-            int playerListId = 0;
-
-            for (int i = 0; i < _players.Count; i++)
+            if (TryGetPlayer(out Player player) == true)
             {
-                if (_players[i]._id == id)
+                player.Ban();
+            }
+        }
+
+        private bool TryGetPlayer(out Player player)
+        {
+            int id;
+
+            while (int.TryParse(Console.ReadLine(), out id) == false)
+                Console.WriteLine("Неверный ввод.");
+
+            foreach (var person in _players)
+            {
+                if (person.Id == id)
                 {
-                    playerListId = i;
+                    player = person;
+                    return true;
                 }
             }
-            return _players[playerListId];
+
+            Console.WriteLine("Такого id не найдено.");
+            player = null;
+            return false;
         }
     }
 }
