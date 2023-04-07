@@ -7,49 +7,48 @@ namespace HomeWork_1
     {
         static void Main(string[] args)
         {
-            const string Command_AddPlayer = "1";
-            const string Command_RemovePlayer = "2";
-            const string Command_BanPlayer = "3";
-            const string Command_UnbanPlayer = "4";
-            const string Command_Exit = "5";
+            const string CommandAddPlayer = "1";
+            const string CommandRemovePlayer = "2";
+            const string CommandBanPlayer = "3";
+            const string CommandUnbanPlayer = "4";
+            const string CommandExit = "5";
 
             Database database = new Database();
             bool isExit = false;
             string userInput;
-            int totalId = 100;
 
             while (isExit == false)
             {
                 Console.WriteLine("Список игроков: ");
                 database.ShowList();
                 Console.Write(
-                    $"\n{Command_AddPlayer} - Добавить игрока. " +
-                    $"\n{Command_RemovePlayer} - Удалить игрока. " +
-                    $"\n{Command_BanPlayer} - Забанить игрока. " +
-                    $"\n{Command_UnbanPlayer} - Разбанить игрока. " +
-                    $"\n{Command_Exit} - Выход. " +
+                    $"\n{CommandAddPlayer} - Добавить игрока. " +
+                    $"\n{CommandRemovePlayer} - Удалить игрока. " +
+                    $"\n{CommandBanPlayer} - Забанить игрока. " +
+                    $"\n{CommandUnbanPlayer} - Разбанить игрока. " +
+                    $"\n{CommandExit} - Выход. " +
                     $"\n\nВаш ввод: ");
                 userInput = Console.ReadLine();
 
                 switch (userInput)
                 {
-                    case Command_AddPlayer:
-                        database.AddPlayer(totalId++);
+                    case CommandAddPlayer:
+                        database.AddPlayer();
                         break;
 
-                    case Command_RemovePlayer:
+                    case CommandRemovePlayer:
                         database.RemovePlayer();
                         break;
 
-                    case Command_BanPlayer:
+                    case CommandBanPlayer:
                         database.BanPlayer();
                         break;
 
-                    case Command_UnbanPlayer:
+                    case CommandUnbanPlayer:
                         database.UnbanPlayer();
                         break;
 
-                    case Command_Exit:
+                    case CommandExit:
                         isExit = true;
                         break;
                 }
@@ -102,20 +101,22 @@ namespace HomeWork_1
     class Database
     {
         private List<Player> _players = new List<Player>();
+        private int TotalId = 100;
 
-        public void AddPlayer(int id)
+        public void AddPlayer()
         {
+            TotalId++;
             Console.Write("Введите ник - ");
             string nickName = Console.ReadLine();
             Console.Write("Укажите уровень - ");
             int level;
-            
-            while(int.TryParse(Console.ReadLine(), out level) == false)
+
+            while (int.TryParse(Console.ReadLine(), out level) == false)
             {
                 Console.WriteLine("Неверный ввод.");
             }
 
-            _players.Add(new Player(nickName, level, id));
+            _players.Add(new Player(nickName, level, TotalId));
         }
 
         public void RemovePlayer()
@@ -159,7 +160,7 @@ namespace HomeWork_1
 
             if (TryGetPlayer(out Player player) == true)
             {
-                player.Ban();
+                player.Unban();
             }
         }
 
