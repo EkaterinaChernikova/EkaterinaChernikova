@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeWork_1
 {
@@ -9,6 +7,10 @@ namespace HomeWork_1
     {
         static void Main(string[] args)
         {
+            const string Command_GetCard = "1";
+            const string Command_LookCardsInHand = "2";
+            const string Command_Exit = "3";
+
             Player player = new Player();
             string userInput;
             bool isExit = false;
@@ -18,19 +20,24 @@ namespace HomeWork_1
                 Console.Clear();
                 Console.WriteLine($"Карт в колоде: {player.GetCardsNumberInDeck()}");
                 Console.WriteLine($"Карт в руке: {player.GetCardsNumberInHand()}");
-                Console.Write("\n1 - Взять карту. \n2 - Посмотреть карты в руке. \n3 - Уйти. \n\nВаш выбор: ");
+                Console.Write("" +
+                    $"\n{Command_GetCard} - Взять карту. " +
+                    $"\n{Command_LookCardsInHand} - Посмотреть карты в руке. " +
+                    $"\n{Command_Exit} - Уйти. \n\nВаш выбор: ");
 
                 userInput = Console.ReadLine();
 
                 switch (userInput)
                 {
-                    case "1":
-                        player.TakeCard();
+                    case Command_GetCard:
+                        player.GetCard();
                         break;
-                    case "2":
+
+                    case Command_LookCardsInHand:
                         player.ShowHand();
                         break;
-                    case "3":
+
+                    case Command_Exit:
                         isExit = true;
                         break;
                 }
@@ -48,7 +55,7 @@ namespace HomeWork_1
             _deckOfCards = new DeckOfCards();
         }
 
-        public void TakeCard()
+        public void GetCard()
         {
             Random random = new Random();
             _cards.Add(_deckOfCards.GetCard(random.Next(0, _deckOfCards.GetCardsNumber())));
