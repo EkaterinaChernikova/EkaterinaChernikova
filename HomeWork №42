@@ -45,7 +45,7 @@ namespace HomeWork_1
                         break;
 
                     case CommandSearchForBook:
-                        SearchForBook(repository);
+                        repository.SearchForBook();
                         break;
 
                     case CommandExit:
@@ -53,50 +53,6 @@ namespace HomeWork_1
                         break;
 
                 }
-            }
-        }
-
-        private static void SearchForBook(Repository repository)
-        {
-            const string CommandShowBooksByTitle = "1";
-            const string CommandShowBooksByAutor = "2";
-            const string CommandShowBooksYear = "3";
-            const string CommandExit = "4";
-
-            string userInput;
-            bool isExit = false;
-
-            while (isExit == false)
-            {
-                Console.Clear();
-                Console.Write("" +
-                    $"\n{CommandShowBooksByTitle} - Поиск по названию книги.  " +
-                    $"\n{CommandShowBooksByAutor} - Поиск по автору.  " +
-                    $"\n{CommandShowBooksYear} - Поиск по году издания. " +
-                    $"\n{CommandExit} - Выйти. " +
-                    "\n\nВаш ввод: ");
-                userInput = Console.ReadLine();
-
-                switch (userInput)
-                {
-                    case CommandShowBooksByTitle:
-                        repository.ShowBooksByTitle();
-                        break;
-
-                    case CommandShowBooksByAutor:
-                        repository.ShowBooksByAutor();
-                        break;
-
-                    case CommandShowBooksYear:
-                        repository.ShowBooksByYear();
-                        break;
-
-                    case CommandExit:
-                        isExit = true;
-                        continue;
-                }
-
-                Console.ReadKey();
             }
         }
     }
@@ -235,6 +191,50 @@ namespace HomeWork_1
                 {
                     book.ShowInfo();
                 }
+            }
+        }
+
+        public void SearchForBook()
+        {
+            const string CommandShowBooksByTitle = "1";
+            const string CommandShowBooksByAutor = "2";
+            const string CommandShowBooksYear = "3";
+            const string CommandExit = "4";
+
+            string userInput;
+            bool isExit = false;
+
+            while (isExit == false)
+            {
+                Console.Clear();
+                Console.Write("" +
+                    $"\n{CommandShowBooksByTitle} - Поиск по названию книги.  " +
+                    $"\n{CommandShowBooksByAutor} - Поиск по автору.  " +
+                    $"\n{CommandShowBooksYear} - Поиск по году издания. " +
+                    $"\n{CommandExit} - Выйти. " +
+                    "\n\nВаш ввод: ");
+                userInput = Console.ReadLine();
+
+                switch (userInput)
+                {
+                    case CommandShowBooksByTitle:
+                        ShowBooksByTitle();
+                        break;
+
+                    case CommandShowBooksByAutor:
+                        ShowBooksByAutor();
+                        break;
+
+                    case CommandShowBooksYear:
+                        ShowBooksByYear();
+                        break;
+
+                    case CommandExit:
+                        isExit = true;
+                        continue;
+                }
+
+                Console.ReadKey();
             }
         }
     }
