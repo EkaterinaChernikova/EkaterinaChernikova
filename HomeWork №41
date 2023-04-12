@@ -12,13 +12,14 @@ namespace HomeWork_1
             const string CommandExit = "3";
 
             Player player = new Player();
+            DeckOfCards deckOfCards = new DeckOfCards();
             string userInput;
             bool isExit = false;
 
             while (isExit == false)
             {
                 Console.Clear();
-                Console.WriteLine($"Карт в колоде: {player.GetCardsNumberInDeck()}");
+                Console.WriteLine($"Карт в колоде: {deckOfCards.GetCardsNumber()}");
                 Console.WriteLine($"Карт в руке: {player.GetCardsNumberInHand()}");
                 Console.Write("" +
                     $"\n{CommandGetCard} - Взять карту. " +
@@ -30,7 +31,8 @@ namespace HomeWork_1
                 switch (userInput)
                 {
                     case CommandGetCard:
-                        player.GetCard();
+                        deckOfCards.Shuffle();
+                        player.TakeCard(deckOfCards.GetCard());
                         break;
 
                     case CommandLookCardsInHand:
@@ -47,18 +49,11 @@ namespace HomeWork_1
 
     class Player
     {
-        private DeckOfCards _deckOfCards;
         private List<Card> _cards = new List<Card>();
 
-        public Player()
+        public void TakeCard(Card card)
         {
-            _deckOfCards = new DeckOfCards();
-        }
-
-        public void GetCard()
-        {
-            _deckOfCards.DeckShuffle();
-            _cards.Add(_deckOfCards.GetCard());
+            _cards.Add(card);
         }
 
         public void ShowHand()
@@ -69,11 +64,6 @@ namespace HomeWork_1
             }
 
             Console.ReadKey();
-        }
-
-        public int GetCardsNumberInDeck()
-        {
-            return _deckOfCards.GetCardsNumber();
         }
 
         public int GetCardsNumberInHand()
@@ -101,31 +91,14 @@ namespace HomeWork_1
 
     class DeckOfCards
     {
-        private List<Card> _cards;
+        private List<Card> _cards = new List<Card>();
 
         public DeckOfCards()
         {
-            _cards = CreateNewDeck();
+            Create();
         }
 
-        private List<Card> CreateNewDeck()
-        {
-            List<Card> newDeck = new List<Card>();
-            string[] values = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
-            char[] suits = { '♥', '♣', '♦', '♠' };
-
-            for (int i = 0; i < suits.Length; i++)
-            {
-                for (int j = 0; j < values.Length; j++)
-                {
-                    newDeck.Add(new Card(values[j], suits[i]));
-                }
-            }
-
-            return newDeck;
-        }
-
-        public void DeckShuffle() 
+        public void Shuffle()
         {
             Card buffer = null;
             Random random = new Random();
@@ -150,6 +123,20 @@ namespace HomeWork_1
         public int GetCardsNumber()
         {
             return _cards.Count;
+        }
+
+        private void Create()
+        {
+            string[] values = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
+            char[] suits = { '♥', '♣', '♦', '♠' };
+
+            for (int i = 0; i < suits.Length; i++)
+            {
+                for (int j = 0; j < values.Length; j++)
+                {
+                    _cards.Add(new Card(values[j], suits[i]));
+                }
+            }
         }
     }
 }
