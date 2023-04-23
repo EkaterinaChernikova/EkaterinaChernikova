@@ -1,58 +1,45 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HomeWork_1
 {
     class Program
     {
-        static void Main(string[] args) 
+        static void Main(string[] args)
         {
-                Trader trader = new Trader();
-                Customer customer = new Customer(2500);
+            Shop shop = new Shop();
 
-                string userInput;
-                string quitCommand = "Q";
-                int costomerChoose;
-                bool isExit = false;
+            string userInput;
+            string quitCommand = "Q";
+            int customerChoose;
+            bool isExit = false;
 
-                while (isExit == false)
+            while (isExit == false)
+            {
+                Console.Clear();
+                Console.WriteLine("Список товаров продавца: ");
+                shop.trader.ShowInfo();
+                Console.WriteLine($"\nДеньги покупателя: {shop.customer.Money}");
+                Console.SetCursorPosition(0, 22);
+                Console.WriteLine("Список купленных товаров: ");
+                shop.customer.ShowInfo();
+                Console.SetCursorPosition(0, 19);
+                Console.Write($"\nКупить товар номер ({quitCommand} - выйти): ");
+                userInput = Console.ReadLine();
+
+                int.TryParse(userInput, out customerChoose);
+
+                if (userInput == quitCommand)
                 {
-                    Console.Clear();
-                    Console.WriteLine("Список товаров продавца: ");
-                    trader.ShowInfo();
-                    Console.WriteLine($"\nДеньги покупателя: {customer.Money}");
-                    Console.SetCursorPosition(0, 22);
-                    Console.WriteLine("Список купленных товаров: ");
-                    customer.ShowInfo();
-                    Console.SetCursorPosition(0, 19);
-                    Console.Write($"\nКупить товар номер ({quitCommand} - выйти): ");
-                    userInput = Console.ReadLine();
-
-                    if (userInput == quitCommand)
-                    {
-                        isExit = true;
-                        continue;
-                    }
-
-                    if (int.TryParse(userInput, out costomerChoose) == false || trader.ShowInventorySize() <= costomerChoose || costomerChoose < 0)
-                    {
-                        continue;
-                    }
-
-                    if (customer.Money >= trader.GetPrice(costomerChoose))
-                    {
-                        Product product = trader.GiveProduct(costomerChoose);
-                        int price = trader.GetPrice(costomerChoose);
-
-                        customer.TakeProduct(product);
-                        customer.Pay(price);
-                        trader.TakeMoney(price);
-                    }
+                    isExit = true;
+                }
+                else if (shop.customer.Money >= shop.trader.GetPrice(customerChoose))
+                {
+                    shop.Trade(customerChoose);
                 }
             }
         }
+    }
 
     class Persona
     {
@@ -71,14 +58,14 @@ namespace HomeWork_1
 
     class Product
     {
-        public string Name { get; private set; }
-        public int Price { get; private set; }
-
         public Product(string name, int price)
         {
             Name = name;
             Price = price;
         }
+
+        public string Name { get; private set; }
+        public int Price { get; private set; }
 
         public void ShowInfo()
         {
@@ -115,13 +102,28 @@ namespace HomeWork_1
 
         public int GetPrice(int productNumber)
         {
-            return Inventory[productNumber].Price;
+            if (productNumber > 0 || productNumber <= Inventory.Count)
+            {
+                return Inventory[productNumber].Price;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public Product GiveProduct(int productNumber)
         {
-            return Inventory[productNumber];
+            if(productNumber > 0 || productNumber <= Inventory.Count)
+            {
+                return Inventory[productNumber];
+            }
+            else
+            {
+                return null;
+            }
         }
+
         public void TakeMoney(int income)
         {
             Money += income;
@@ -137,12 +139,31 @@ namespace HomeWork_1
 
         public void TakeProduct(Product product)
         {
-            Inventory.Add(product);
+            if(product != null)
+            {
+                Inventory.Add(product);
+            }
         }
 
         public void Pay(int price)
         {
             Money -= price;
+        }
+    }
+
+    class Shop
+    {
+        public Trader trader { get; private set; } = new Trader();
+        public Customer customer { get; private set; } = new Customer(2500);
+
+        public void Trade(int customerChoose)
+        {
+            Product product = trader.GiveProduct(customerChoose);
+            int price = trader.GetPrice(customerChoose);
+
+            customer.TakeProduct(product);
+            customer.Pay(price);
+            trader.TakeMoney(price);
         }
     }
 }
