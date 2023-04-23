@@ -113,7 +113,7 @@ namespace HomeWork_1
             Console.Write("Укажите автора книги: ");
             string author = Console.ReadLine();
             int year;
-            
+
             do
             {
                 Console.SetCursorPosition(0, 11);
@@ -125,8 +125,8 @@ namespace HomeWork_1
 
             for (int i = 0; i < _books.Count; i++)
             {
-                if (_books[i].Title.ToLower() == title && 
-                    _books[i].Author.ToLower() == author && 
+                if (_books[i].Title.ToLower() == title &&
+                    _books[i].Author.ToLower() == author &&
                     _books[i].Year == year)
                 {
                     _books.RemoveAt(i);
@@ -142,57 +142,6 @@ namespace HomeWork_1
             }
 
             Console.ReadKey();
-        }
-
-        public void ShowBooksByTitle()
-        {
-            Console.Write("Введите название книги: ");
-            string userInput = Console.ReadLine();
-
-            foreach (var book in _books)
-            {
-                if (book.Title.ToLower() == userInput.ToLower())
-                {
-                    book.ShowInfo();
-                }
-            }
-        }
-
-        public void ShowBooksByAutor()
-        {
-            Console.Write("Введите автора книги: ");
-            string userInput = Console.ReadLine();
-
-            foreach (var book in _books)
-            {
-                if (book.Author.ToLower() == userInput.ToLower())
-                {
-                    book.ShowInfo();
-                }
-            }
-        }
-
-        public void ShowBooksByYear()
-        {
-            string userInput;
-            int year;
-
-            do
-            {
-                Console.SetCursorPosition(0, 7);
-                Console.Write("Введите год издания: ".PadRight(50));
-                Console.SetCursorPosition(21, 7);
-                userInput = Console.ReadLine();
-            }
-            while (int.TryParse(userInput, out year) == false);
-
-            foreach (var book in _books)
-            {
-                if (book.Year == year)
-                {
-                    book.ShowInfo();
-                }
-            }
         }
 
         public void SearchForBook()
@@ -236,6 +185,57 @@ namespace HomeWork_1
                 }
 
                 Console.ReadKey();
+            }
+        }
+
+        private void ShowBooksByTitle()
+        {
+            Console.Write("Введите название книги: ");
+            string userInput = Console.ReadLine();
+
+            foreach (var book in _books)
+            {
+                if (book.Title.ToLower() == userInput.ToLower())
+                {
+                    book.ShowInfo();
+                }
+            }
+        }
+
+        private void ShowBooksByAutor()
+        {
+            Console.Write("Введите автора книги: ");
+            string userInput = Console.ReadLine();
+
+            foreach (var book in _books)
+            {
+                if (book.Author.ToLower() == userInput.ToLower())
+                {
+                    book.ShowInfo();
+                }
+            }
+        }
+
+        private void ShowBooksByYear()
+        {
+            string userInput;
+            int year;
+
+            do
+            {
+                Console.SetCursorPosition(0, 7);
+                Console.Write("Введите год издания: ".PadRight(50));
+                Console.SetCursorPosition(21, 7);
+                userInput = Console.ReadLine();
+            }
+            while (int.TryParse(userInput, out year) == false);
+
+            foreach (var book in _books)
+            {
+                if (book.Year == year)
+                {
+                    book.ShowInfo();
+                }
             }
         }
     }
