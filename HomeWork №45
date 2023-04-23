@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HomeWork_1
+namespace HomeWork_1Command_Choose_StartFighter
 {
     class Program
     {
@@ -19,9 +19,9 @@ namespace HomeWork_1
 
         public void OpenMenu()
         {
-            const string Command_Choose_StartFighter = "1";
-            const string Command_StartFight = "2";
-            const string Command_Exit = "3";
+            const string CommandChooseStartFighter = "1";
+            const string CommandStartFight = "2";
+            const string CommandExit = "3";
             string userInput;
             bool isExit = false;
 
@@ -36,21 +36,21 @@ namespace HomeWork_1
                 }
 
 
-                Console.Write($"\n{Command_Choose_StartFighter} - Выбрать бойцов " +
-                              $"\n{Command_StartFight} - Начать бой " +
-                              $"\n{Command_Exit} - Выйти \n\nВаш выбор: ");
+                Console.Write($"\n{CommandChooseStartFighter} - Выбрать бойцов " +
+                              $"\n{CommandStartFight} - Начать бой " +
+                              $"\n{CommandExit} - Выйти \n\nВаш выбор: ");
                 userInput = Console.ReadLine();
 
                 switch (userInput)
                 {
-                    case Command_Choose_StartFighter:
+                    case CommandChooseStartFighter:
                         _player1 = ChooseStartFighter();
                         _player2 = ChooseStartFighter();
                         break;
-                    case Command_StartFight:
+                    case CommandStartFight:
                         StartFight();
                         break;
-                    case Command_Exit:
+                    case CommandExit:
                         isExit = true;
                         break;
                 }
@@ -119,7 +119,7 @@ namespace HomeWork_1
                     $"\n{_player1.ClassName} - {initiativePlayer1}" +
                     $"\n{_player2.ClassName} - {initiativePlayer2}\n");
 
-                if(initiativePlayer1 <= 0 && initiativePlayer2 <= 0)
+                if (initiativePlayer1 <= 0 && initiativePlayer2 <= 0)
                 {
                     Console.WriteLine("Оба бойца провалили инициативу, ход пропущкен.");
                 }
@@ -127,7 +127,7 @@ namespace HomeWork_1
                 {
                     Console.WriteLine($"Первым атакует: {_player2.ClassName}" +
                         $"\n{_player1.ClassName} провал инициативы, пропускает ход.");
-                        _player2.Attack(_player1);
+                    _player2.Attack(_player1);
                 }
                 else if (initiativePlayer2 <= 0)
                 {
@@ -159,14 +159,14 @@ namespace HomeWork_1
                 Console.ReadKey();
                 round++;
 
-                if (_player1.IsDead() == true || _player2.IsDead() == true)
+                if (_player1.IsDead() || _player2.IsDead())
                 {
                     isSomeoneDead = true;
                 }
             }
 
             Console.Clear();
-            WhoWin();
+            ShowWinnder();
             Console.ReadKey();
         }
 
@@ -175,17 +175,18 @@ namespace HomeWork_1
             _player1.ShowInfo();
             _player2.ShowInfo();
         }
-        private void WhoWin() 
-        { 
-            if (_player1.IsDead() == true && _player2.IsDead() == false)
+
+        private void ShowWinnder()
+        {
+            if (_player1.IsDead() && _player2.IsDead() == false)
             {
                 Console.WriteLine($"Победитель: {_player2.ClassName}");
             }
-            else if (_player2.IsDead() == true && _player1.IsDead() == false)
+            else if (_player2.IsDead() && _player1.IsDead() == false)
             {
                 Console.WriteLine($"Победитель: {_player1.ClassName}");
             }
-            else if (_player1.IsDead() == true && _player2.IsDead() == true)
+            else if (_player1.IsDead() && _player2.IsDead())
             {
                 Console.WriteLine($"Ничья");
             }
@@ -202,24 +203,25 @@ namespace HomeWork_1
         protected int Accuracy = 0;
         protected int CritChance = 20;
         protected int CritRate = 2;
-        protected int CritFail = 1;
         protected int BaseDamage = 5;
         protected int Initiative = 0;
-        protected int MinRoll = 1;
-        protected int MaxRoll = 21;
-        protected int LostEvasione = 10;
-        protected bool IsEvaseoneLost = false;
-        protected Random Random = new Random();
+        private int _critFail = 1;
+        private int _minRoll = 1;
+        private int _maxRoll = 21;
+        private int _lostEvasione = 10;
+        private bool _isEvaseoneLost = false;
+        private Random _random = new Random();
         private string _hit = "Hit";
-        private string _fail = "Fail";
+        private string _miss = "Fail";
         private string _critHit = "CritHit";
-        private string _critFail = "CritFail";
-        public string ClassName { get; private set; }
-               
+        private string _critMiss = "_critFail";
+
         public Player(string className = "None")
         {
             ClassName = className;
         }
+
+        public string ClassName { get; private set; }
 
         public virtual void Attack(Player target)
         {
@@ -229,64 +231,13 @@ namespace HomeWork_1
             hit = MakeHit(target);
             LoseEvasioneCheck(hit);
 
-            if (hit == _fail || hit == _critFail)
+            if (hit == _miss || hit == _critMiss)
             {
                 return;
             }
-        
+
             damage = MakeDamage(hit);
             target.TakeDamage(damage);
-        }
-
-        public string MakeHit(Player target)
-        {
-            int diceRoll = Roll(MinRoll, MaxRoll);
-            int totalRoll = diceRoll + Accuracy;
-
-            if (diceRoll <= CritFail)
-            {
-                Console.WriteLine($"{ClassName} - Атака: {diceRoll} - критический промах");
-                return _critFail;
-            }
-            else if (diceRoll >= CritChance)
-            {
-                Console.WriteLine($"{ClassName} - Атака: {diceRoll} - критическое попадание");
-                return _critHit;
-            }
-
-            if (target.Evasione < totalRoll)
-            {
-                Console.WriteLine($"{ClassName} - Атака: {diceRoll} + {Accuracy} = {totalRoll} > {target.ClassName} уклонение: {target.Evasione} - попадание");
-                return _hit;
-            }
-            else if (target.Evasione >= totalRoll)
-            {
-                Console.WriteLine($"{ClassName} - Атака: {diceRoll} + {Accuracy} = {totalRoll} <= {target.ClassName} уклонение: {target.Evasione} - промах");
-                return _fail;
-            }
-
-            return "";
-        }
-
-        public int MakeDamage(string hit)
-        {
-            if (BaseDamage <= 0)
-            {
-                return 0;
-            }
-
-            if (hit == _hit)
-            {
-                Console.WriteLine($"{ClassName} наносит {BaseDamage} урона");
-                return BaseDamage;
-            }
-            else if (hit == _critHit)
-            {
-                Console.WriteLine($"{ClassName} наносит: {BaseDamage} * {CritRate} = {BaseDamage * CritRate} урона");
-                return BaseDamage * CritRate;
-            }
-
-            return 0;
         }
 
         public void TakeDamage(int takenDamage)
@@ -302,27 +253,9 @@ namespace HomeWork_1
             HealthPoint -= totalDamage;
         }
 
-        public bool TakeHeal(int healCount)
-        {
-            int lostHealth = MaxHealthPoint - HealthPoint;
-
-            if (lostHealth >= healCount)
-            {
-                HealthPoint += healCount;
-                return true;
-            }
-
-            return false;
-        }
-
-        public void ExpendEnergy(int energyCost)
-        {
-            EnergyPoint -= energyCost;
-        }
-
         public void ChangeStats(int[] changes, bool isIncreace)
         {
-            if (isIncreace == true)
+            if (isIncreace)
             {
                 ArmorProtection += changes[0];
                 Evasione += changes[1];
@@ -346,13 +279,8 @@ namespace HomeWork_1
 
         public int RollInitiative()
         {
-            int diceRoll = Roll(MinRoll, MaxRoll);
+            int diceRoll = Roll(_minRoll, _maxRoll);
             return diceRoll + Initiative;
-        }
-
-        public int Roll(int minRoll, int maxRoll)
-        {
-            return Random.Next(minRoll, maxRoll);
         }
 
         public bool IsDead()
@@ -364,24 +292,98 @@ namespace HomeWork_1
             return false;
         }
 
-        public void LoseEvasioneCheck(string hit)
-        {
-            if (hit == _critFail && IsEvaseoneLost == false)
-            {
-                Console.WriteLine($"{ClassName} подставился под удар, уклонение -{LostEvasione} до следующего хода");
-                Evasione -= LostEvasione;
-                IsEvaseoneLost = true;
-            }
-            else if (hit != _critFail && IsEvaseoneLost == true)
-            {
-                Evasione += LostEvasione;
-                IsEvaseoneLost = false;
-            }
-        }
-
         public void ShowInfo()
         {
             Console.WriteLine($"{ClassName}\nЗдоровье: {HealthPoint} \nЭнергия: {EnergyPoint} \n");
+        }
+
+        protected bool TakeHeal(int healCount)
+        {
+            int lostHealth = MaxHealthPoint - HealthPoint;
+
+            if (lostHealth >= healCount)
+            {
+                HealthPoint += healCount;
+                return true;
+            }
+
+            return false;
+        }
+
+        protected void ExpendEnergy(int energyCost)
+        {
+            EnergyPoint -= energyCost;
+        }
+
+        private string MakeHit(Player target)
+        {
+            int diceRoll = Roll(_minRoll, _maxRoll);
+            int totalRoll = diceRoll + Accuracy;
+
+            if (diceRoll <= _critFail)
+            {
+                Console.WriteLine($"{ClassName} - Атака: {diceRoll} - критический промах");
+                return _critMiss;
+            }
+            else if (diceRoll >= CritChance)
+            {
+                Console.WriteLine($"{ClassName} - Атака: {diceRoll} - критическое попадание");
+                return _critHit;
+            }
+
+            if (target.Evasione < totalRoll)
+            {
+                Console.WriteLine($"{ClassName} - Атака: {diceRoll} + {Accuracy} = {totalRoll} > {target.ClassName} уклонение: {target.Evasione} - попадание");
+                return _hit;
+            }
+            else if (target.Evasione >= totalRoll)
+            {
+                Console.WriteLine($"{ClassName} - Атака: {diceRoll} + {Accuracy} = {totalRoll} <= {target.ClassName} уклонение: {target.Evasione} - промах");
+                return _miss;
+            }
+
+            return "";
+        }
+
+        private int MakeDamage(string hit)
+        {
+            if (BaseDamage <= 0)
+            {
+                return 0;
+            }
+
+            if (hit == _hit)
+            {
+                Console.WriteLine($"{ClassName} наносит {BaseDamage} урона");
+                return BaseDamage;
+            }
+            else if (hit == _critHit)
+            {
+                Console.WriteLine($"{ClassName} наносит: {BaseDamage} * {CritRate} = {BaseDamage * CritRate} урона");
+                return BaseDamage * CritRate;
+            }
+
+            return 0;
+        }
+
+        private void LoseEvasioneCheck(string hit)
+        {
+            if (hit == _critMiss && _isEvaseoneLost == false)
+            {
+                Console.WriteLine($"{ClassName} подставился под удар, уклонение -{_lostEvasione} до следующего хода");
+                Evasione -= _lostEvasione;
+                _isEvaseoneLost = true;
+            }
+            else if (hit != _critMiss && _isEvaseoneLost)
+            {
+                Evasione += _lostEvasione;
+                _isEvaseoneLost = false;
+            }
+        }
+
+        private int Roll(int minRoll, int maxRoll)
+        {
+            return _random.Next(minRoll, maxRoll);
         }
     }
 
@@ -428,7 +430,7 @@ namespace HomeWork_1
                 Console.WriteLine($"{ClassName} использует {_abilityName} и получает: {abilityDescription}");
             }
 
-            if (_currentDuration == 0 && _isActive == true)
+            if (_currentDuration == 0 && _isActive)
             {
                 _isActive = false;
 
@@ -440,7 +442,7 @@ namespace HomeWork_1
             {
                 _currentRecharge--;
             }
-          
+
             if (_currentDuration > 0)
             {
                 _currentDuration--;
@@ -490,7 +492,7 @@ namespace HomeWork_1
                 Console.WriteLine($"{ClassName} использует {_abilityName} и получает: {abilityDescription}");
             }
 
-            if (_currentDuration == 0 && _isActive == true)
+            if (_currentDuration == 0 && _isActive)
             {
                 _isActive = false;
 
@@ -552,7 +554,7 @@ namespace HomeWork_1
                 Console.WriteLine($"{ClassName} использует {_abilityName} и получает: {abilityDescription}");
             }
 
-            if (_currentDuration == 0 && _isActive == true)
+            if (_currentDuration == 0 && _isActive)
             {
                 _isActive = false;
 
@@ -624,7 +626,7 @@ namespace HomeWork_1
                 Console.WriteLine($"{ClassName} использует {_abilityName} и получает: {abilityDescription}");
             }
 
-            if (_currentDuration == 0 && _isActive == true)
+            if (_currentDuration == 0 && _isActive)
             {
                 _isActive = false;
 
@@ -647,7 +649,7 @@ namespace HomeWork_1
         {
             string magicDescription = $"Лечит себя на {_magicPower} хитов, перезарядка {_magicRecharge} ходов.";
 
-            if (energyCost <= EnergyPoint && _currentMagicRecharge == 0 && TakeHeal(_magicPower) == true)
+            if (energyCost <= EnergyPoint && _currentMagicRecharge == 0 && TakeHeal(_magicPower))
             {
                 ExpendEnergy(energyCost);
 
@@ -708,7 +710,7 @@ namespace HomeWork_1
                 Console.WriteLine($"{ClassName} использует {_abilityName} и получает: {abilityDescription}");
             }
 
-            if (_currentDuration == 0 && _isActive == true)
+            if (_currentDuration == 0 && _isActive)
             {
                 _isActive = false;
 
@@ -784,7 +786,7 @@ namespace HomeWork_1
                 _isActive = true;
             }
 
-            if (_currentTrickDuration == 0 && _isActive == true)
+            if (_currentTrickDuration == 0 && _isActive)
             {
                 target.ChangeStats(new int[7]
                 {
@@ -866,7 +868,7 @@ namespace HomeWork_1
                 _isActive = true;
             }
 
-            if (_currentTrickDuration == 0 && _isActive == true)
+            if (_currentTrickDuration == 0 && _isActive)
             {
                 target.ChangeStats(new int[7]
                 {
@@ -948,7 +950,7 @@ namespace HomeWork_1
                 Console.WriteLine($"{ClassName} использует {_abilityName} и получает: {abilityDescription}");
             }
 
-            if (_currentDuration == 0 && _isActive == true)
+            if (_currentDuration == 0 && _isActive)
             {
                 _isActive = false;
 
@@ -992,7 +994,7 @@ namespace HomeWork_1
                 _isActive = true;
             }
 
-            if (_currentTrickDuration == 0 && _isActive == true)
+            if (_currentTrickDuration == 0 && _isActive)
             {
                 target.ChangeStats(new int[7]
                 {
@@ -1114,7 +1116,7 @@ namespace HomeWork_1
                 _isActive = true;
             }
 
-            if (_currentTrickDuration == 0 && _isActive == true)
+            if (_currentTrickDuration == 0 && _isActive)
             {
                 target.ChangeStats(new int[7]
                 {
@@ -1172,7 +1174,7 @@ namespace HomeWork_1
                 ExpendEnergy(energyCost);
 
                 _currentMagicRecharge = _magicRecharge;
-         
+
                 Console.WriteLine($"{ClassName} использует {_magicName}, {target.ClassName} получает: {magicDescription}");
 
                 target.TakeDamage(_magicPower);
@@ -1230,7 +1232,7 @@ namespace HomeWork_1
                 Evasione += _magicPower;
             }
 
-            if (_currentMagicDuration == 0 && _isActive == true)
+            if (_currentMagicDuration == 0 && _isActive)
             {
                 ArmorProtection -= _magicPower;
                 Evasione -= _magicPower;
@@ -1311,7 +1313,7 @@ namespace HomeWork_1
                 }, false);
             }
 
-            if (_currentMagicDuration == 0 && _isActive == true)
+            if (_currentMagicDuration == 0 && _isActive)
             {
                 target.ChangeStats(new int[7] {
                     0,
@@ -1389,7 +1391,7 @@ namespace HomeWork_1
                 Console.WriteLine($"{ClassName} использует {_abilityName} и получает: {abilityDescription}");
             }
 
-            if (_currentDuration == 0 && _isActive == true)
+            if (_currentDuration == 0 && _isActive)
             {
                 _isActive = false;
 
@@ -1412,7 +1414,7 @@ namespace HomeWork_1
         {
             string magicDescription = $"Лечит себя на {_magicPower} хитов, перезарядка {_magicRecharge} ходов.";
 
-            if (energyCost <= EnergyPoint && _currentMagicRecharge == 0 && TakeHeal(_magicPower) == true)
+            if (energyCost <= EnergyPoint && _currentMagicRecharge == 0 && TakeHeal(_magicPower))
             {
                 ExpendEnergy(energyCost);
 
@@ -1469,7 +1471,7 @@ namespace HomeWork_1
                 _currentDuration = _magicDuration;
             }
 
-            if (_currentDuration > 0 && _isActive == true)
+            if (_currentDuration > 0 && _isActive)
             {
                 Console.WriteLine($"Паук атакует {target.ClassName}");
                 target.TakeDamage(_magicPower);
