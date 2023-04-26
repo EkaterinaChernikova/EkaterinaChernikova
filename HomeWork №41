@@ -19,8 +19,8 @@ namespace HomeWork_1
             while (isExit == false)
             {
                 Console.Clear();
-                Console.WriteLine($"Карт в колоде: {deckOfCards._cards.Count}");
-                Console.WriteLine($"Карт в руке: {player._cards.Count}");
+                Console.WriteLine($"Карт в колоде: {deckOfCards.GetCardsCount()}");
+                Console.WriteLine($"Карт в руке: {player.GetCardsCount()}");
                 Console.Write("" +
                     $"\n{CommandGetCard} - Взять карту. " +
                     $"\n{CommandLookCardsInHand} - Посмотреть карты в руке. " +
@@ -48,11 +48,11 @@ namespace HomeWork_1
 
     class Player
     {
-        public List<Card> _cards { get; private set; } = new List<Card>();
+        private List<Card> _cards = new List<Card>();
 
         public void TakeCard(Card card)
         {
-            if(_cards.Count > 0)
+            if (_cards.Count > 0)
             {
                 _cards.Add(card);
             }
@@ -66,6 +66,11 @@ namespace HomeWork_1
             }
 
             Console.ReadKey();
+        }
+
+        public int GetCardsCount()
+        {
+            return _cards.Count;
         }
     }
 
@@ -88,15 +93,26 @@ namespace HomeWork_1
 
     class DeckOfCards
     {
+        private List<Card> _cards = new List<Card>();
+
         public DeckOfCards()
         {
             Create();
             Shuffle();
         }
 
-        public List<Card> _cards { get; private set; } = new List<Card>();
+        public int GetCardsCount()
+        {
+            return _cards.Count;
+        }
 
-        public void Shuffle()
+        public Card GetCard()
+        {
+            Card randomCard = _cards[_cards.Count - 1];
+            _cards.Remove(_cards[_cards.Count - 1]);
+            return randomCard;
+        }
+        private void Shuffle()
         {
             Card buffer = null;
             Random random = new Random();
@@ -109,13 +125,6 @@ namespace HomeWork_1
                 _cards[i] = _cards[cardId];
                 _cards[cardId] = buffer;
             }
-        }
-
-        public Card GetCard()
-        {
-            Card randomCard = _cards[_cards.Count - 1];
-            _cards.Remove(_cards[_cards.Count - 1]);
-            return randomCard;
         }
 
         private void Create()
