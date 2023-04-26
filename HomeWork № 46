@@ -7,59 +7,90 @@ namespace HomeWork
     {
         static void Main(string[] args)
         {
-            Queue<Buyer> queue = new Queue<Buyer>();
-            Buyer buyer;
             string userInput;
             int buyersCount;
-            int buyerTotalPrice;
-            Random random = new Random();
 
-            Console.Write("Сколько клиентов обслужить сегодня? Введите число: ");
-            userInput = Console.ReadLine();
-            buyersCount = Convert.ToInt32(userInput);
-
-            for (int i = 0; i < buyersCount; i++)
-            {
-                queue.Enqueue(new Buyer(i, random.Next(100, 10000), random.Next(1, 20)));
-            }
-
-            while (queue.Count > 0)
+            do
             {
                 Console.Clear();
+                Console.Write("Сколько клиентов обслужить сегодня? Введите число: ");
+                userInput = Console.ReadLine();
+            }
+            while (int.TryParse(userInput, out buyersCount) == false);
 
-                buyer = queue.Peek();
-                buyerTotalPrice = CalculateTotalPrice(buyer.products);
+            Market market = new Market(buyersCount);
 
-                Console.WriteLine($"Людей в очереди: {queue.Count}");
-                buyer.printInfo();
-                Console.WriteLine($"Итоговая сумма покупок: {buyerTotalPrice}");
-
-                
-                if(buyerTotalPrice > buyer.Money)
-                {
-                    Console.WriteLine("У покупателя не достаточно денег.");
-                    buyer.RemoveRandomProduct();
-                }
-                else if (buyerTotalPrice != 0)
-                {
-                    Console.WriteLine("У покупателя достаточно денег.");
-                    buyer.Pay(buyerTotalPrice);
-                    queue.Dequeue();
-                }
-                else if (buyerTotalPrice == 0)
-                {
-                    Console.WriteLine("Покупатель уходит ни с чем.");
-                    queue.Dequeue();
-                }
-
+            while (market.GetQueueCount() > 0)
+            {
+                Console.Clear();
+                market.ServeBuyer();
                 Console.ReadKey();
             }
 
             Console.WriteLine("Покупатели на сегодня закончились.");
             Console.ReadKey();
         }
+    }
 
-        static int CalculateTotalPrice(List<Product> products)
+    class Market
+    {
+        private Queue<Buyer> _queue = new Queue<Buyer>();
+        private List<Product> _products = new List<Product>();
+        private Buyer _buyer;
+        private Random _random = new Random();
+
+        public Market(int buyersCount)
+        {
+            int marketProductsCount = 50;
+            int minimalProductPrice = 200;
+            int maximalProductPrice = 2500;
+            int minimalBuyerFinance = 1000;
+            int maximalBuyerFinance = 10000;
+
+            for(int i = 0; i < marketProductsCount; i++)
+            {
+                _products.Add(new Product(i, _random.Next(minimalProductPrice, maximalProductPrice)));
+            }
+
+            for(int i = 0; i < buyersCount; i++)
+            {
+                _queue.Enqueue(new Buyer(i, _products, _random.Next(minimalBuyerFinance, maximalBuyerFinance)));
+            }
+        }
+
+        public void ServeBuyer()
+        {
+            _buyer = _queue.Peek();
+            int buyerTotalPrice = CalculateTotalPrice(_buyer.GetList());
+
+            Console.WriteLine($"Людей в очереди: {_queue.Count}");
+            _buyer.PrintInfo();
+            Console.WriteLine($"Итоговая сумма покупок: {buyerTotalPrice}");
+
+            if (buyerTotalPrice > _buyer.Money)
+            {
+                Console.WriteLine("У покупателя не достаточно денег.");
+                _buyer.RemoveRandomProduct();
+            }
+            else if (buyerTotalPrice != 0)
+            {
+                Console.WriteLine("У покупателя достаточно денег.");
+                _buyer.Pay(buyerTotalPrice);
+                _queue.Dequeue();
+            }
+            else if (buyerTotalPrice == 0)
+            {
+                Console.WriteLine("Покупатель уходит ни с чем.");
+                _queue.Dequeue();
+            }
+        }
+
+        public int GetQueueCount()
+        {
+            return _queue.Count;
+        }
+
+        public int CalculateTotalPrice(List<Product> products)
         {
             int TotalPrice = 0;
 
@@ -74,37 +105,47 @@ namespace HomeWork
 
     class Buyer
     {
-        private string Number = "Покупатель № ";
-        private Random random = new Random();
-        public Buyer(int number, int money, int productsCount)
+        private string _number = "Покупатель № ";
+        private Random _random = new Random();
+        private List<Product> _product = new List<Product>();
+
+        public Buyer(int number, List<Product> products, int money)
         {
-            Number += number;
+            int minimalProducts = 1;
+            int maximalProducts = 10;
+
+            _number += number;
             Money = money;
+            int productsCount = _random.Next(minimalProducts, maximalProducts);
 
             for (int i = 0; i < productsCount; i++)
             {
-                products.Add(new Product(i, random.Next(100, 2500)));
+                _product.Add(products[_random.Next(0, productsCount)]);
             }
         }
-        
+
         public int Money { get; private set; }
-        public List<Product> products { get; private set; } = new List<Product>();
 
-        public void printInfo()
+        public List<Product> GetList()
         {
-            Console.WriteLine(Number + " Имеющиеся финансы: " + Money);
+            return _product;
+        }
 
-            foreach (Product product in products)
+        public void PrintInfo()
+        {
+            Console.WriteLine(_number + " Имеющиеся финансы: " + Money);
+
+            foreach (Product product in _product)
             {
-                product.printInfo();
+                product.PrintInfo();
             }
         }
 
         public void RemoveRandomProduct()
         {
-            int index = random.Next(0, products.Count);
-            Console.WriteLine($"Покупатель отказался от {products[index].Title}");
-            products.RemoveAt(index);
+            int index = _random.Next(0, _product.Count);
+            Console.WriteLine($"Покупатель отказался от {_product[index].Title}");
+            _product.RemoveAt(index);
         }
 
         public void Pay(int price)
@@ -125,7 +166,7 @@ namespace HomeWork
         public string Title { get; private set; }
         public int Price { get; private set; }
 
-        public void printInfo()
+        public void PrintInfo()
         {
             Console.WriteLine(Title + " Цена " + Price);
         }
