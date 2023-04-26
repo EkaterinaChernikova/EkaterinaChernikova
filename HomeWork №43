@@ -27,13 +27,12 @@ namespace HomeWork_1
                 Console.Write($"\nКупить товар номер ({quitCommand} - выйти): ");
                 userInput = Console.ReadLine();
 
-                int.TryParse(userInput, out customerChoose);
-
                 if (userInput == quitCommand)
                 {
                     isExit = true;
                 }
-                else if (shop.customer.Money >= shop.trader.GetPrice(customerChoose))
+                else if (int.TryParse(userInput, out customerChoose) &&
+                         shop.customer.Money >= shop.trader.GetPrice(customerChoose))
                 {
                     shop.Trade(customerChoose);
                 }
@@ -114,7 +113,7 @@ namespace HomeWork_1
 
         public Product GiveProduct(int productNumber)
         {
-            if(productNumber >= 0 && productNumber < Inventory.Count)
+            if (productNumber >= 0 && productNumber < Inventory.Count)
             {
                 return Inventory[productNumber];
             }
@@ -139,7 +138,7 @@ namespace HomeWork_1
 
         public void TakeProduct(Product product)
         {
-            if(product != null)
+            if (product != null)
             {
                 Inventory.Add(product);
             }
