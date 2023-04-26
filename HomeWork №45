@@ -7,6 +7,15 @@ namespace HomeWork_1Command_Choose_StartFighter
     {
         static void Main(string[] args)
         {
+            using System;
+using System.Collections.Generic;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
             Arena arena = new Arena();
             arena.OpenMenu();
         }
@@ -62,9 +71,21 @@ namespace HomeWork_1Command_Choose_StartFighter
             Player player = null;
             List<Player> classes = new List<Player>()
             {
-                new Barbarian(), new Knight(), new Gladiator(), new Paladin(), new Berserk(),
-                new Hunter(),new Rogue(), new Monk(), new Assasin(), new Trickster(),
-                new Mage(), new Shaman(), new Warlock(), new Priest(), new Summoner()
+                new Barbarian(), 
+                new Knight(), 
+                new Gladiator(), 
+                new Paladin(), 
+                new Berserk(),
+                new Hunter(),
+                new Rogue(), 
+                new Monk(), 
+                new Assasin(), 
+                new Trickster(),
+                new Mage(), 
+                new Shaman(), 
+                new Warlock(), 
+                new Priest(), 
+                new Summoner()
             };
 
             string userInput;
@@ -78,7 +99,10 @@ namespace HomeWork_1Command_Choose_StartFighter
 
                 for (int i = 0; i < classes.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {classes[i].ClassName}");
+                    i++;
+                    Console.WriteLine($"{i}. ");
+                    i--;
+                    Console.WriteLine($"{classes[i].ClassName}");
                 }
 
                 Console.Write("\nВаш выбор: ");
@@ -107,21 +131,11 @@ namespace HomeWork_1Command_Choose_StartFighter
                 Console.Clear();
                 Console.WriteLine($"Ход боя: {round}\n");
                 ShowRoundInfo();
-
-                do
-                {
-                    initiativePlayer1 = _player1.RollInitiative();
-                    initiativePlayer2 = _player2.RollInitiative();
-                }
-                while (initiativePlayer1 == initiativePlayer2);
-
-                Console.WriteLine("\nИнициатива бойцов: " +
-                    $"\n{_player1.ClassName} - {initiativePlayer1}" +
-                    $"\n{_player2.ClassName} - {initiativePlayer2}\n");
+                RollInitiative(out initiativePlayer1, out initiativePlayer2);
 
                 if (initiativePlayer1 <= 0 && initiativePlayer2 <= 0)
                 {
-                    Console.WriteLine("Оба бойца провалили инициативу, ход пропущкен.");
+                    Console.WriteLine("Оба бойца провалили инициативу, ход пропущен.");
                 }
                 else if (initiativePlayer1 <= 0)
                 {
@@ -168,6 +182,20 @@ namespace HomeWork_1Command_Choose_StartFighter
             Console.Clear();
             ShowWinnder();
             Console.ReadKey();
+        }
+
+        private void RollInitiative(out int initiativePlayer1, out int initiativePlayer2)
+        {
+            do
+            {
+                initiativePlayer1 = _player1.RollInitiative();
+                initiativePlayer2 = _player2.RollInitiative();
+            }
+            while (initiativePlayer1 == initiativePlayer2);
+
+            Console.WriteLine("\nИнициатива бойцов: " +
+                $"\n{_player1.ClassName} - {initiativePlayer1}" +
+                $"\n{_player2.ClassName} - {initiativePlayer2}\n");
         }
 
         private void ShowRoundInfo()
