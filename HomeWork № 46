@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace HomeWork_1Command_Choose_StartFighter
+namespace HomeWork
 {
     class Program
     {
