@@ -52,7 +52,7 @@ namespace HomeWork_1
 
         public void TakeCard(Card card)
         {
-            if (_cards.Count > 0)
+            if (card != null)
             {
                 _cards.Add(card);
             }
@@ -108,10 +108,16 @@ namespace HomeWork_1
 
         public Card GetCard()
         {
+            if (_cards.Count == 0)
+            {
+                return null;
+            }
+
             Card randomCard = _cards[_cards.Count - 1];
             _cards.Remove(_cards[_cards.Count - 1]);
             return randomCard;
         }
+
         private void Shuffle()
         {
             Card buffer = null;
