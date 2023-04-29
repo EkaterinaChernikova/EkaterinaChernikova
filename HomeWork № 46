@@ -47,14 +47,16 @@ namespace HomeWork
             int minimalBuyerFinance = 1000;
             int maximalBuyerFinance = 10000;
 
-            for(int i = 0; i < marketProductsCount; i++)
+            for (int i = 0; i < marketProductsCount; i++)
             {
                 _products.Add(new Product(i, _random.Next(minimalProductPrice, maximalProductPrice)));
             }
 
-            for(int i = 0; i < buyersCount; i++)
+            List<Product> copyedList = _products;
+
+            for (int i = 0; i < buyersCount; i++)
             {
-                _queue.Enqueue(new Buyer(i, _products, _random.Next(minimalBuyerFinance, maximalBuyerFinance)));
+                _queue.Enqueue(new Buyer(i, copyedList, _random.Next(minimalBuyerFinance, maximalBuyerFinance)));
             }
         }
 
@@ -128,7 +130,8 @@ namespace HomeWork
 
         public List<Product> GetList()
         {
-            return _product;
+            List<Product> productList = _product; 
+            return productList;
         }
 
         public void PrintInfo()
