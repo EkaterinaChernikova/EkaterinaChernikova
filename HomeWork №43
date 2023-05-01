@@ -1,48 +1,21 @@
 using System;
 using System.Collections.Generic;
 
-namespace HomeWork_1
+namespace HomeWork
 {
     class Program
     {
         static void Main(string[] args)
         {
             Shop shop = new Shop();
-
-            string userInput;
-            string quitCommand = "Q";
-            int customerChoose;
-            bool isExit = false;
-
-            while (isExit == false)
-            {
-                Console.Clear();
-                Console.WriteLine("Список товаров продавца: ");
-                shop.trader.ShowInfo();
-                Console.WriteLine($"\nДеньги покупателя: {shop.customer.Money}");
-                Console.SetCursorPosition(0, 22);
-                Console.WriteLine("Список купленных товаров: ");
-                shop.customer.ShowInfo();
-                Console.SetCursorPosition(0, 19);
-                Console.Write($"\nКупить товар номер ({quitCommand} - выйти): ");
-                userInput = Console.ReadLine();
-
-                if (userInput == quitCommand)
-                {
-                    isExit = true;
-                }
-                else if (int.TryParse(userInput, out customerChoose) &&
-                         shop.customer.Money >= shop.trader.GetPrice(customerChoose))
-                {
-                    shop.Trade(customerChoose);
-                }
-            }
+            shop.OpenShop();
         }
     }
 
     class Persona
     {
         protected List<Product> Inventory = new List<Product>();
+
         public int Money { get; protected set; }
 
         public void ShowInfo()
@@ -146,14 +119,49 @@ namespace HomeWork_1
 
         public void Pay(int price)
         {
-            Money -= price;
+            if (price >= 0)
+            {
+                Money -= price;
+            }
         }
     }
 
     class Shop
     {
-        public Trader trader { get; private set; } = new Trader();
-        public Customer customer { get; private set; } = new Customer(2500);
+        private Trader trader = new Trader();
+        private Customer customer = new Customer(2500);
+
+        public void OpenShop()
+        {
+            string userInput;
+            string quitCommand = "Q";
+            int customerChoose;
+            bool isExit = false;
+
+            while (isExit == false)
+            {
+                Console.Clear();
+                Console.WriteLine("Список товаров продавца: ");
+                trader.ShowInfo();
+                Console.WriteLine($"\nДеньги покупателя: {customer.Money}");
+                Console.SetCursorPosition(0, 22);
+                Console.WriteLine("Список купленных товаров: ");
+                customer.ShowInfo();
+                Console.SetCursorPosition(0, 19);
+                Console.Write($"\nКупить товар номер ({quitCommand} - выйти): ");
+                userInput = Console.ReadLine();
+
+                if (userInput == quitCommand)
+                {
+                    isExit = true;
+                }
+                else if (int.TryParse(userInput, out customerChoose) &&
+                         customer.Money >= trader.GetPrice(customerChoose))
+                {
+                    Trade(customerChoose);
+                }
+            }
+        }
 
         public void Trade(int customerChoose)
         {
