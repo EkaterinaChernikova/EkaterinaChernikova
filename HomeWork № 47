@@ -1,0 +1,324 @@
+using System;
+using System.Collections.Generic;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            BattleGround battleGround = new BattleGround();
+            battleGround.StartBattle();
+        }
+    }
+
+    class BattleGround
+    {
+        private Random _random = new Random();
+        private Squad _squad1;
+        private Squad _squad2;
+        private string _squad1Name = "Альфа";
+        private string _squad2Name = "Омега";
+
+        public BattleGround()
+        {
+            _squad1 = new Squad(_random, _squad1Name);
+            _squad2 = new Squad(_random, _squad2Name);
+        }
+
+        public void StartBattle()
+        {
+            bool isBattleEnd = false;
+
+            while (isBattleEnd == false)
+            {
+                Console.Clear();
+                ChooseSquadPriority();
+                Console.WriteLine($"\n-----Действия отряда: {_squad1.Name}");
+                MakeSquadAction(_squad1, _squad2);
+                Console.WriteLine($"\n-----Действия отряда: {_squad2.Name}");
+                MakeSquadAction(_squad2, _squad1);
+
+                isBattleEnd = IsBattleEnd();
+
+                Console.ReadKey();
+            }
+        }
+
+        private bool IsBattleEnd()
+        {
+            if (_squad1.GetAliveSoldiers() == 0 || _squad2.GetAliveSoldiers() == 0)
+            {
+                if (_squad1.GetAliveSoldiers() == 0)
+                {
+                    Console.WriteLine($"\nOтряд {_squad1.Name} потерпел поражение.\n");
+                }
+                else if (_squad2.GetAliveSoldiers() == 0)
+                {
+                    Console.WriteLine($"\nOтряд {_squad2.Name} потерпел поражение.\n");
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private void MakeSquadAction(Squad squad1, Squad squad2)
+        {
+            int targetId = -1;
+
+            for (int i = 0; i < squad1.GetSquadCount(); i++)
+            {
+                if (squad1.IsSoldierIsDead(i) == true)
+                {
+                    continue;
+                }
+
+                targetId = squad1.ChooseTarget(i, squad2);
+
+                if (targetId < 0)
+                {
+                    squad1.OrderToMove(i);
+                }
+                else
+                {
+                    int damage = squad1.OrderToShot(i, _random);
+                    squad2.SoldierTakeDamage(targetId, damage);
+
+                    if (squad2.IsSoldierIsDead(targetId) == true)
+                    {
+                        squad2.CasualtySoldier();
+                    }
+                }
+            }
+        }
+
+        private void ChooseSquadPriority()
+        {
+            Squad buffer;
+            int squadsCount = 2;
+            int randomSquad = _random.Next(0, squadsCount);
+
+            if(randomSquad == 1)
+            {
+                buffer = _squad1;
+                _squad1 = _squad2;
+                _squad2 = buffer;
+            }
+
+            Console.WriteLine("Порядок хода отрядов: \n" +
+                $"Первый отряд {_squad1.Name} численность: {_squad1.GetAliveSoldiers()}\n" +
+                $"Второй отряд {_squad2.Name} численность: {_squad2.GetAliveSoldiers()}");
+        }
+    }
+
+    class Soldier
+    {
+        private int _health = 100;
+        private int _accuracy = 50;
+        private Weapon _weapon;
+        private bool _isDead = false;
+
+        public Soldier(Random random)
+        {
+            string[] randomNames = 
+            {
+                "Игнат", "Владимир", "Ростислав", "Емельян", "Максим", 
+                "Юлий", "Данила", "Фёдор", "Федот", "Дмитрий",
+                "Макар", "Артём", "Станислав", "Денис", "Роберт",
+                "Илларион", "Павел", "Юлиан", "Георгий", "Вячеслав",
+                "Никита", "Илья", "Анатолий", "Альберт", "Викентий",
+                "Борис", "Валерий", "Игорь", "Арсений", "Михаил"
+            };
+            int healthMinimal = -10;
+            int healthMaximal = 10;
+            int accuracyMinimal = -20;
+            int accuracyMaximal = 20;
+
+            Name = randomNames[random.Next(0, randomNames.Length)];
+            _health += random.Next(healthMinimal, healthMaximal);
+            _accuracy += random.Next(accuracyMinimal, accuracyMaximal);
+            _weapon = new Weapon(random);
+        }
+
+        public int Position { get; private set; } = 50;
+        public string Name { get; private set; }
+
+        public void Move()
+        {
+            int moveSpeed = 10;
+            Position -= moveSpeed;
+        }
+
+        public Weapon GetWeapon()
+        {
+            return _weapon;
+        }
+
+        public bool IsShotHit(Random random)
+        {
+            int aimMinimal = 0;
+            int aimMaximal = 100;
+            int aim = random.Next(aimMinimal, aimMaximal);
+            bool isHit = false;
+            
+            if (_accuracy > aim)
+            {
+                isHit = true;
+            }
+
+            return isHit;
+        }
+
+        public void TakeDamage(int damage)
+        {
+            _health -= damage;
+        }
+
+        public bool IsDead()
+        {
+            if (_health <= 0 && _isDead == false)
+            {
+                _isDead = true;
+                Console.WriteLine($"{Name} погиб.");
+                Name += " (Мёртв)";
+                return _isDead;
+            }
+
+            return _isDead;
+        }
+
+        public string ShowInfo()
+        {
+            return $"\n{Name} с {_weapon.Name} на позиции {Position}\n";
+        }
+    }
+
+    class Weapon
+    {
+        public Weapon(Random random)
+        {
+            string[] randomWeapons =
+            {
+                "Пистолет 10 15",
+                "Дробовик 40 10",
+                "Винтовка 25 30",
+                "Автомат 35 20",
+                "Снайп.Винтовка 70 50",
+            };
+            string[] splitLine = randomWeapons[random.Next(0, randomWeapons.Length)].Split(' ');
+            Name = splitLine[0];
+            int buffer;
+            int.TryParse(splitLine[1], out buffer);
+            Damage = buffer;
+            int.TryParse(splitLine[2], out buffer);
+            Distance = buffer;
+        }
+
+        public string Name { get; private set; }
+        public int Damage { get; private set; }
+        public int Distance { get; private set; }
+    }
+
+    class Squad
+    {
+        private List<Soldier> _soldiers = new List<Soldier>();
+        private int _squadSize = 10;
+
+        public Squad(Random random, string name)
+        {
+            Name = name;
+
+            for (int i = 0; i < _squadSize; i++)
+            {
+                _soldiers.Add(new Soldier(random));
+            }
+        }
+
+        public string Name { get; private set; }
+         
+        public int GetAliveSoldiers()
+        {
+            return _squadSize;
+        }
+
+        public string GetSoldierName(int soldierId)
+        {
+            return _soldiers[soldierId].Name;
+        }
+
+        public void CasualtySoldier()
+        {
+            _squadSize -= 1;
+        }
+
+        public bool IsSoldierIsDead(int soldierId)
+        {
+            return _soldiers[soldierId].IsDead();
+        }
+
+        public void SoldierTakeDamage(int soldierId, int damage)
+        {
+            if (damage > 0)
+            {
+                _soldiers[soldierId].TakeDamage(damage);
+                Console.WriteLine($"{_soldiers[soldierId].Name} и наносит {damage} урона.\n");
+            }
+        }
+
+        public int ChooseTarget(int soldierId, Squad enemySquad)
+        {
+            int targetId = -1;
+            Soldier target = null;
+
+            for (int i = 0; i < enemySquad.GetSquadCount(); i++)
+            {
+                int range = _soldiers[soldierId].Position + enemySquad._soldiers[i].Position;
+
+                if (_soldiers[soldierId].GetWeapon().Distance >= range &&
+                    enemySquad._soldiers[i].IsDead() == false)
+                {
+                    if (target == null || 
+                        target.Position > enemySquad._soldiers[i].Position)
+                    {
+                        target = enemySquad._soldiers[i];
+                        targetId = i;
+                    }
+                }
+            }
+
+            return targetId;
+        }
+
+        public void OrderToMove(int soldierId)
+        {
+            Console.WriteLine($"{_soldiers[soldierId].ShowInfo()} движется к противнику.\n");
+            _soldiers[soldierId].Move();
+        }
+
+        public int OrderToShot(int soldierId, Random random)
+        {
+            Console.Write($"{_soldiers[soldierId].ShowInfo()} стреляет");
+
+            if (_soldiers[soldierId].IsShotHit(random) == true)
+            {
+                Console.Write(" и попадает в ");
+                return _soldiers[soldierId].GetWeapon().Damage;
+            }
+
+            Console.WriteLine(" и промахивается.\n");
+            return 0;
+        }
+
+        public void PrintSoldierInfo(int soldierId)
+        {
+            _soldiers[soldierId].ShowInfo();
+        }
+
+        public int GetSquadCount()
+        {
+            return _soldiers.Count;
+        }
+    }
+}
