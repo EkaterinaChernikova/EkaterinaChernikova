@@ -17,11 +17,11 @@ namespace HomeWork
         private Random _random = new Random();
         private Squad _squad1;
         private Squad _squad2;
-        private string _squad1Name = "Альфа";
-        private string _squad2Name = "Омега";
 
         public BattleGround()
         {
+            string _squad1Name = "Альфа";
+            string _squad2Name = "Омега";
             _squad1 = new Squad(_random, _squad1Name);
             _squad2 = new Squad(_random, _squad2Name);
         }
@@ -47,13 +47,13 @@ namespace HomeWork
 
         private bool IsBattleEnd()
         {
-            if (_squad1.GetAliveSoldiers() == 0 || _squad2.GetAliveSoldiers() == 0)
+            if (_squad1.GetSquadCount() == 0 || _squad2.GetSquadCount() == 0)
             {
-                if (_squad1.GetAliveSoldiers() == 0)
+                if (_squad1.GetSquadCount() == 0)
                 {
                     Console.WriteLine($"\nOтряд {_squad1.Name} потерпел поражение.\n");
                 }
-                else if (_squad2.GetAliveSoldiers() == 0)
+                else if (_squad2.GetSquadCount() == 0)
                 {
                     Console.WriteLine($"\nOтряд {_squad2.Name} потерпел поражение.\n");
                 }
@@ -79,16 +79,16 @@ namespace HomeWork
 
                 if (targetId < 0)
                 {
-                    squad1.OrderToMove(i);
+                    squad1.MoveSoldier(i);
                 }
                 else
                 {
-                    int damage = squad1.OrderToShot(i, _random);
+                    int damage = squad1.Shoot(i, _random);
                     squad2.SoldierTakeDamage(targetId, damage);
 
                     if (squad2.IsSoldierIsDead(targetId) == true)
                     {
-                        squad2.CasualtySoldier();
+                        squad2.CasualtySoldier(targetId);
                     }
                 }
             }
@@ -100,7 +100,7 @@ namespace HomeWork
             int squadsCount = 2;
             int randomSquad = _random.Next(0, squadsCount);
 
-            if(randomSquad == 1)
+            if (randomSquad == 1)
             {
                 buffer = _squad1;
                 _squad1 = _squad2;
@@ -108,8 +108,8 @@ namespace HomeWork
             }
 
             Console.WriteLine("Порядок хода отрядов: \n" +
-                $"Первый отряд {_squad1.Name} численность: {_squad1.GetAliveSoldiers()}\n" +
-                $"Второй отряд {_squad2.Name} численность: {_squad2.GetAliveSoldiers()}");
+                $"Первый отряд {_squad1.Name} численность: {_squad1.GetSquadCount()}\n" +
+                $"Второй отряд {_squad2.Name} численность: {_squad2.GetSquadCount()}");
         }
     }
 
@@ -122,9 +122,9 @@ namespace HomeWork
 
         public Soldier(Random random)
         {
-            string[] randomNames = 
+            string[] randomNames =
             {
-                "Игнат", "Владимир", "Ростислав", "Емельян", "Максим", 
+                "Игнат", "Владимир", "Ростислав", "Емельян", "Максим",
                 "Юлий", "Данила", "Фёдор", "Федот", "Дмитрий",
                 "Макар", "Артём", "Станислав", "Денис", "Роберт",
                 "Илларион", "Павел", "Юлиан", "Георгий", "Вячеслав",
@@ -151,9 +151,14 @@ namespace HomeWork
             Position -= moveSpeed;
         }
 
-        public Weapon GetWeapon()
+        public int GetWeaponRange()
         {
-            return _weapon;
+            return _weapon.Distance;
+        }
+
+        public int GetWeaponDamage()
+        {
+            return _weapon.Damage;
         }
 
         public bool IsShotHit(Random random)
@@ -162,13 +167,8 @@ namespace HomeWork
             int aimMaximal = 100;
             int aim = random.Next(aimMinimal, aimMaximal);
             bool isHit = false;
-            
-            if (_accuracy > aim)
-            {
-                isHit = true;
-            }
 
-            return isHit;
+            return isHit = _accuracy > aim;
         }
 
         public void TakeDamage(int damage)
@@ -224,33 +224,28 @@ namespace HomeWork
     class Squad
     {
         private List<Soldier> _soldiers = new List<Soldier>();
-        private int _squadSize = 10;
 
         public Squad(Random random, string name)
         {
+            int squadSize = 10;
             Name = name;
 
-            for (int i = 0; i < _squadSize; i++)
+            for (int i = 0; i < squadSize; i++)
             {
                 _soldiers.Add(new Soldier(random));
             }
         }
 
         public string Name { get; private set; }
-         
-        public int GetAliveSoldiers()
-        {
-            return _squadSize;
-        }
 
         public string GetSoldierName(int soldierId)
         {
             return _soldiers[soldierId].Name;
         }
 
-        public void CasualtySoldier()
+        public void CasualtySoldier(int soldierId)
         {
-            _squadSize -= 1;
+            _soldiers.RemoveAt(soldierId);
         }
 
         public bool IsSoldierIsDead(int soldierId)
@@ -276,10 +271,10 @@ namespace HomeWork
             {
                 int range = _soldiers[soldierId].Position + enemySquad._soldiers[i].Position;
 
-                if (_soldiers[soldierId].GetWeapon().Distance >= range &&
+                if (_soldiers[soldierId].GetWeaponRange() >= range &&
                     enemySquad._soldiers[i].IsDead() == false)
                 {
-                    if (target == null || 
+                    if (target == null ||
                         target.Position > enemySquad._soldiers[i].Position)
                     {
                         target = enemySquad._soldiers[i];
@@ -291,20 +286,20 @@ namespace HomeWork
             return targetId;
         }
 
-        public void OrderToMove(int soldierId)
+        public void MoveSoldier(int soldierId)
         {
             Console.WriteLine($"{_soldiers[soldierId].ShowInfo()} движется к противнику.\n");
             _soldiers[soldierId].Move();
         }
 
-        public int OrderToShot(int soldierId, Random random)
+        public int Shoot(int soldierId, Random random)
         {
             Console.Write($"{_soldiers[soldierId].ShowInfo()} стреляет");
 
             if (_soldiers[soldierId].IsShotHit(random) == true)
             {
                 Console.Write(" и попадает в ");
-                return _soldiers[soldierId].GetWeapon().Damage;
+                return _soldiers[soldierId].GetWeaponDamage();
             }
 
             Console.WriteLine(" и промахивается.\n");
