@@ -1,0 +1,377 @@
+using System;
+using System.Collections.Generic;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            CarService carService = new CarService();
+            carService.StartWork();
+        }
+    }
+
+    class CarService
+    {
+        private int _money = 10000;
+        private Random _random = new Random();
+        private Werehouse _werehouse;
+        private Client _client = null;
+
+        public CarService()
+        {
+            _werehouse = new Werehouse(_random);
+        }
+
+        public void StartWork()
+        {
+            bool isExit = false;
+
+            while (isExit == false)
+            {
+                Console.Clear();
+                Console.WriteLine("Сервис начал работу:\n" +
+                                 $"Средства сервиса {_money}\n" +
+                                 $"Детали имеющиеся на складе:\n");
+
+                _werehouse.ShowPartList();
+                CreateRandomClient();
+                ShowMenu(ref isExit);
+
+                if (isExit == false)
+                {
+                    isExit = AnalysisFinance();
+                }
+
+                Console.ReadKey();
+            }
+        }
+
+        public void CreateRandomClient()
+        {
+            if(_client == null)
+            {
+                _client = new Client(_random);
+            }
+        }
+
+        private bool AnalysisFinance()
+        {
+            bool isExit = false;
+
+            if(_money <= 0)
+            {
+                isExit = true;
+                Console.WriteLine($" Вы приносите слишком много убытков, вы уволены.");
+            }
+
+            return isExit;
+        }
+
+        private void ShowMenu(ref bool isExit)
+        {
+            const string Command_Repair = "1";
+            const string Command_Refuse = "2";
+            const string Command_Exit = "3";
+            string userInput;
+
+            Console.Write("\n К вам в сервис пожаловал клиент, \n" +
+                $"в его машине сломана деталь №{_client.GetCarPartNumber()}:\n" +
+                $"{Command_Repair}. Заменить сломанную деталь. \n" +
+                $"{Command_Refuse}. Отказать в обслуживании.\n" +
+                $"{Command_Exit}. Уволиться.\n" +
+                $"Ваш выбор: ");
+
+            userInput = Console.ReadLine();
+
+            switch (userInput)
+            {
+                case Command_Repair:
+                    Repair();
+                    break;
+                case Command_Refuse:
+                    Refuse();
+                    break;
+                case Command_Exit:
+                    isExit = true;
+                    break;
+            }
+        }
+
+        private void Repair()
+        {
+            const string Command_Yes = "1";
+            const string Command_No = "2";
+
+            string userInput;
+            int partNumber = 0;
+            int priceForWork = 0;
+            int priceRatio1 = 4;
+            int priceRatio2 = 3;
+
+            Console.Write("\n На какую деталь заменить сломанную?\n" +
+                " Ваш ввод: ");
+
+            userInput = Console.ReadLine();
+            int.TryParse(userInput, out partNumber);
+
+            if (_werehouse.FindPart(partNumber) == true)
+            {
+                Console.WriteLine($"\n Вы заметили сломанную деталь №{_client.GetCarPartNumber()} на деталь №{partNumber}.");
+                priceForWork = _werehouse.GetPrice(partNumber) * priceRatio1 / priceRatio2;
+
+                if (_client.GetCarPartNumber() == partNumber)
+                {
+                    if (_client.Money >= priceForWork)
+                    {
+                        _client.Pay(priceForWork);
+                        _money += priceForWork;
+                        Console.WriteLine(" Клиент расплатился за работу, можно приступать к ремонту.");
+                        _werehouse.RemovePart(partNumber);
+                        _client.RemoveCarBreackDown();
+                        Console.WriteLine(" Ремонт прошел успешно, клиент доволен.");
+                        _client = null;
+                    }
+                    else
+                    {
+                        Console.WriteLine(" Клиент не может расплатился за работу, уходит ругаясь матом.");
+                        _client = null;
+                    }
+                }
+                else 
+                {
+                    Console.WriteLine(" Вы перепутали детали, клиент не доволен. Вас ждёт штраф! Клиент ушёл в другой сервис.");
+                    _werehouse.RemovePart(partNumber);
+                    GetPenalty(priceForWork);
+                    _client = null;
+                }
+            }
+            else
+            {
+                Console.Write("\n Данной детали на складе не обнаружено.\n" +
+                    "Приобрести недостающую деталь?\n" +
+                    $"{Command_Yes}. Да.\n" +
+                    $"{Command_No}. Нет.\n" +
+                    $"Ваш выбор: ");
+
+                userInput = Console.ReadLine();
+
+                if (userInput == Command_Yes)
+                {
+                    BuyCarPart(partNumber);
+                }
+            }
+        }
+
+        private void BuyCarPart(int partNumber)
+        {
+            CarPart newPart = new CarPart(partNumber);
+
+            if (newPart.Price <= _money)
+            {
+                _money -= newPart.Price;
+                _werehouse.AddCarPart(partNumber);
+                Console.WriteLine(" Деталь успешно приобретена.");
+            }
+            else
+            {
+                Console.WriteLine(" Увы, вы не можете позволить себе таких расходов.");
+            }
+        }
+
+        private void Refuse()
+        {
+            int standartPenalty = 500;
+            GetPenalty(standartPenalty);
+            _client = null;
+            Console.WriteLine($" Вы отказались обслуживать, вас оштрафовалина {standartPenalty}, клиент ушел недовольный.");
+        }
+
+        private void GetPenalty(int penalty)
+        {
+            _money -= penalty;
+        }
+    }
+
+    class Werehouse
+    {
+        private int _capacity = 100;
+        private List<CarPart> _storage = new List<CarPart>();
+
+        public Werehouse(Random random)
+        {
+            for(int i = 0; i < _capacity; i++)
+            {
+                _storage.Add(new CarPart(random));
+            }
+        }
+
+        public void RemovePart(int partNumber)
+        {
+            for (int i = 0; i < _storage.Count; i++)
+            {
+                if (_storage[i].Number == partNumber)
+                {
+                    _storage.RemoveAt(i);
+                    i = _storage.Count;
+                }
+            }
+        }
+
+        public int GetPrice(int partNumber)
+        {
+            int price = 0;
+
+            for (int i = 0; i < _storage.Count; i++)
+            {
+                if (_storage[i].Number == partNumber)
+                {
+                    price = _storage[i].Price;
+                    i = _storage.Count;
+                }
+            }
+
+            return price;
+        }
+
+        public void AddCarPart(int partNumber)
+        {
+            _storage.Add(new CarPart(partNumber));
+        }
+
+        public void ShowPartList()
+        {
+            SortStorage();
+
+            int partsCount;
+
+            for (int i = 0; i < _storage.Count; i += partsCount)
+            {
+                partsCount = 0;
+
+                for(int j = i; j < _storage.Count; j++)
+                {
+                    if(_storage[i].Number == _storage[j].Number)
+                    {
+                        partsCount++;
+                    }
+                }
+
+                Console.WriteLine($"Номер: {_storage[i].Number} Цена: {_storage[i].Price} Кол-во: {partsCount}");
+            }
+        }
+
+        public bool FindPart(int number)
+        {
+            bool isFind = false;
+
+            foreach (CarPart carPart in _storage)
+            {
+                if (carPart.Number == number)
+                {
+                    isFind = true;
+                }
+            }
+
+            return isFind;
+        }
+
+        private void SortStorage()
+        {
+            CarPart buffer;
+
+            for(int i = 0; i < _storage.Count; i++)
+            {
+                for(int j = i; j < _storage.Count; j++)
+                {
+                    if (_storage[i].Number > _storage[j].Number)
+                    {
+                        buffer = _storage[i];
+                        _storage[i] = _storage[j];
+                        _storage[j] = buffer;
+                    }
+                }
+            }
+        }
+    }
+    
+
+    class Car
+    {
+        private CarPart _breackdown;
+
+        public Car(Random random)
+        {
+            _breackdown = new CarPart(random);
+        }
+
+        public void RemoveBreackDown()
+        {
+            _breackdown = null;
+        }
+
+        public int GetPartNumber()
+        {
+            return _breackdown.Number;
+        }
+    }
+
+    class Client
+    {
+        private Car _car;
+
+        public Client(Random random)
+        {
+            int minimalMoney = 5000;
+            int maximalMoney = 15000;
+
+            _car = new Car(random);
+            Money = random.Next(minimalMoney, maximalMoney);
+        }
+
+        public int Money;
+
+        public void Pay(int price)
+        {
+            Money -= price;
+        }
+
+        public void RemoveCarBreackDown()
+        {
+            _car.RemoveBreackDown();
+        }
+
+        public int GetCarPartNumber()
+        {
+            return _car.GetPartNumber();
+        }
+    }
+
+    class CarPart
+    {
+        public CarPart(Random random)
+        {
+            int minimalPartNumber = 1;
+            int maximalPartNumber = 25;
+
+            Number = random.Next(minimalPartNumber, maximalPartNumber);
+            Price = Number * PartPriceRate;
+        }
+
+        public CarPart(int partNumber)
+        {
+            Number = partNumber;
+            Price = Number * PartPriceRate;
+        }
+
+        public int PartPriceRate { get; private set; } = 500;
+        public int Price { get; private set; }
+        public int Number { get; private set; }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"Номер детали: {Number}, цена детали: {Price}");
+        }
+    }
+}
