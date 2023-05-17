@@ -124,6 +124,11 @@ namespace HomeWork
 
     abstract class Animal
     {
+        public Animal()
+        {
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
         public string Type { get; protected set; }
         public string Gender { get; protected set; }
         public string Sound { get; protected set; }
@@ -134,11 +139,6 @@ namespace HomeWork
         {
             Console.WriteLine($"Название: {Type}, пол: {Gender}");
         }
-
-        private void SetGender()
-        {
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
-        }
     }
 
     class Owl : Animal
@@ -146,11 +146,10 @@ namespace HomeWork
         private string _type = "Сова";
         private string _sound = "Уху";
 
-        public Owl()
+        public Owl() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -164,11 +163,10 @@ namespace HomeWork
         private string _type = "Дикий кот";
         private string _sound = "Мяу";
 
-        public WildCat()
+        public WildCat() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -182,11 +180,10 @@ namespace HomeWork
         private string _type = "Павлин";
         private string _sound = "аааАААааа!";
 
-        public Peacock()
+        public Peacock() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -200,11 +197,10 @@ namespace HomeWork
         private string _type = "Лошадь";
         private string _sound = "Фыр";
 
-        public Hourse()
+        public Hourse() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -213,17 +209,15 @@ namespace HomeWork
         }
     }
 
-
     class DeerMoonjack : Animal
     {
         private string _type = "Олень-мунжак";
         private string _sound = "ААААаафф";
 
-        public DeerMoonjack()
+        public DeerMoonjack() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -237,11 +231,10 @@ namespace HomeWork
         private string _type = "Лось";
         private string _sound = "Нуууу";
 
-        public Moose()
+        public Moose() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -255,11 +248,10 @@ namespace HomeWork
         private string _type = "Рысь";
         private string _sound = "Аам";
 
-        public Lynx()
+        public Lynx() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -273,11 +265,10 @@ namespace HomeWork
         private string _type = "Кролик";
         private string _sound = "хурррр";
 
-        public Rabbit()
+        public Rabbit() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -291,11 +282,10 @@ namespace HomeWork
         private string _type = "Волк";
         private string _sound = "грррр";
 
-        public Wolf()
+        public Wolf() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
@@ -309,11 +299,10 @@ namespace HomeWork
         private string _type = "Черепаха";
         private string _sound = "***";
 
-        public Turtle()
+        public Turtle() : base()
         {
             Type = _type;
             Sound = _sound;
-            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
         }
 
         public override Animal Clone()
