@@ -3,6 +3,21 @@ using System.Collections.Generic;
 
 namespace HomeWork
 {
+    static class Randomizer
+    {
+        private static Random random = new Random();
+
+        public static int GetRandomNumber(int minimal, int maximal)
+        {
+            return random.Next(minimal, maximal);
+        }
+
+        public static double GetRandomDoubleNumber()
+        {
+            return random.NextDouble();
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -13,22 +28,21 @@ namespace HomeWork
             bool isExit = false;
             string userInput;
 
-            while(isExit == false)
+            while (isExit == false)
             {
                 Console.Clear();
-                Console.Write($"Вы находитесь в зоопарке, в зоопарке {zoo.GetEnclousureCount()} вольеров,\n" +
+                Console.Write($"Вы находитесь в зоопарке, в зоопарке {zoo.EnclosuresCount} вольеров,\n" +
                               $"к какому вольеру вы хотите подойти? \nВведите число (или {Command_Exit} для выхода): ");
 
                 userInput = Console.ReadLine();
 
-                switch (userInput)
+                if (userInput.ToLower() == Command_Exit.ToLower())
                 {
-                    case Command_Exit:
-                        isExit = true;
-                        break;
-                    default:
-                        zoo.Walk(userInput);
-                        break;
+                    isExit = true;
+                }
+                else
+                {
+                    zoo.Walk(userInput);
                 }
 
                 Console.ReadKey();
@@ -38,39 +52,37 @@ namespace HomeWork
 
     class Zoo
     {
-        private Random _random = new Random();
         private List<Enclosure> _enclosures = new List<Enclosure>();
-        private List<Animal> _exampleAnimals = new List<Animal>()
-        {
-            new Animal("Сова", "Уху"),
-            new Animal("Дикий кот", "Мяу"),
-            new Animal("Павлин", "аааАААааа!"),
-            new Animal("Лошадь", "Фыр"),
-            new Animal("Олень-мунжак", "ААААаафф"),
-            new Animal("Лось", "Нуууу"),
-            new Animal("Рысь", "Аам"),
-            new Animal("Кролик", "хурррр"),
-            new Animal("Волк", "грррр"),
-            new Animal("Черепаха", "***")
-        };
 
         public Zoo()
         {
-            foreach (Animal animal in _exampleAnimals)
+            List<Animal> exampleAnimals = new List<Animal>()
             {
-                _enclosures.Add(new Enclosure(_random, animal));
+                new Owl(),
+                new WildCat(),
+                new Hourse(),
+                new Peacock(),
+                new DeerMoonjack(),
+                new Moose(),
+                new Lynx(),
+                new Rabbit(),
+                new Wolf(),
+                new Turtle(),
+            };
+
+            foreach (Animal animal in exampleAnimals)
+            {
+                _enclosures.Add(new Enclosure(animal));
             }
+
+            EnclosuresCount = _enclosures.Count;
         }
 
-        public int GetEnclousureCount()
-        {
-            return _enclosures.Count;
-        }
+        public int EnclosuresCount { get; private set; }
 
         public void Walk(string userInput)
         {
-            int enclosureNumber;
-            int.TryParse(userInput, out enclosureNumber);
+            int.TryParse(userInput, out int enclosureNumber);
             enclosureNumber--;
 
             if (enclosureNumber >= 0 && enclosureNumber < _enclosures.Count)
@@ -84,16 +96,16 @@ namespace HomeWork
     {
         private List<Animal> _animals = new List<Animal>();
 
-        public Enclosure(Random random, Animal animal)
+        public Enclosure(Animal animal)
         {
             int minimalAnimalsCount = 5;
             int maximalAnimalsCount = 15;
 
-            Capacity = random.Next(minimalAnimalsCount, maximalAnimalsCount);
+            Capacity = Randomizer.GetRandomNumber(minimalAnimalsCount, maximalAnimalsCount);
 
             for (int i = 0; i < Capacity; i++)
             {
-                _animals.Add(new Animal(animal.Type, animal.Sound, random));
+                _animals.Add(animal.Clone());
             }
         }
 
@@ -110,36 +122,203 @@ namespace HomeWork
         }
     }
 
-    class Animal
+    abstract class Animal
     {
-        public Animal(string type, string sound)
-        {
-            Type = type;
-            Sound = sound;
-        }
+        public string Type { get; protected set; }
+        public string Gender { get; protected set; }
+        public string Sound { get; protected set; }
 
-        public Animal(string type, string sound, Random random)
-        {
-            Type = type;
-            Sound = sound;
-
-            if (random.NextDouble() >= 0.5)
-            {
-                Gender = "M";
-            }
-            else
-            {
-                Gender = "Ж";
-            }
-        }
-
-        public string Type { get; private set; }
-        public string Gender { get; private set; }
-        public string Sound { get; private set; }
+        public abstract Animal Clone();
 
         public void ShowInfo()
         {
             Console.WriteLine($"Название: {Type}, пол: {Gender}");
+        }
+
+        private void SetGender()
+        {
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+    }
+
+    class Owl : Animal
+    {
+        private string _type = "Сова";
+        private string _sound = "Уху";
+
+        public Owl()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Owl();
+        }
+    }
+
+    class WildCat : Animal
+    {
+        private string _type = "Дикий кот";
+        private string _sound = "Мяу";
+
+        public WildCat()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new WildCat();
+        }
+    }
+
+    class Peacock : Animal
+    {
+        private string _type = "Павлин";
+        private string _sound = "аааАААааа!";
+
+        public Peacock()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Peacock();
+        }
+    }
+
+    class Hourse : Animal
+    {
+        private string _type = "Лошадь";
+        private string _sound = "Фыр";
+
+        public Hourse()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Hourse();
+        }
+    }
+
+
+    class DeerMoonjack : Animal
+    {
+        private string _type = "Олень-мунжак";
+        private string _sound = "ААААаафф";
+
+        public DeerMoonjack()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new DeerMoonjack();
+        }
+    }
+
+    class Moose : Animal
+    {
+        private string _type = "Лось";
+        private string _sound = "Нуууу";
+
+        public Moose()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Moose();
+        }
+    }
+
+    class Lynx : Animal
+    {
+        private string _type = "Рысь";
+        private string _sound = "Аам";
+
+        public Lynx()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Lynx();
+        }
+    }
+
+    class Rabbit : Animal
+    {
+        private string _type = "Кролик";
+        private string _sound = "хурррр";
+
+        public Rabbit()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Rabbit();
+        }
+    }
+
+    class Wolf : Animal
+    {
+        private string _type = "Волк";
+        private string _sound = "грррр";
+
+        public Wolf()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Wolf();
+        }
+    }
+
+    class Turtle : Animal
+    {
+        private string _type = "Черепаха";
+        private string _sound = "***";
+
+        public Turtle()
+        {
+            Type = _type;
+            Sound = _sound;
+            Gender = Randomizer.GetRandomDoubleNumber() >= 0.5 ? "М" : "Ж";
+        }
+
+        public override Animal Clone()
+        {
+            return new Turtle();
         }
     }
 }
