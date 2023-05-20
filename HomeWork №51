@@ -1,0 +1,117 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Repository repository = new Repository();
+            int userInputHeight;
+            int userInputWeight;
+            string userInputNationality;
+            bool isExit = false;
+
+            while (isExit == false)
+            {
+                Console.Clear();
+
+                Console.Write("Введите данные подозреваемого\n" +
+                              " Рост (160 - 200): ");
+                int.TryParse(Console.ReadLine(), out userInputHeight);
+                Console.Write(" Вес (65 - 100): ");
+                int.TryParse(Console.ReadLine(), out userInputWeight);
+                Console.Write(" Национальность " +
+                    "(Чукча, Бурят, Канадец, Казах, Ариец, Нанаец, Славянин, Чуваш, Беларус, Удмурд): ");
+                userInputNationality = Console.ReadLine();
+
+                repository.SearchForCriteries(userInputHeight, userInputWeight, userInputNationality);
+
+                Console.ReadKey();
+            }
+        }
+    }
+
+    class Criminal
+    {
+        public Criminal(Random random)
+        {
+            string[] firstNames = 
+            {
+                "Иван", "Дмитрий", "Владимир", "Глеб", "Егор", "Максим", "Влад", "Олег", "Джардани", "Иоган"
+            };
+            string[] secondNames = 
+            {
+                "Дмитриевич", "Иванович", "Александрович", "Владимирович", "Сергеевич", "Георгиевич", "Николаевич", "Олегович", "Йовановович", "Мансурович"
+            };
+            string[] lastNames = 
+            {
+                "Чеботарев", "Петрович", "Минкин", "Устинов", "Синькевич", "Иванов", "Ионцев", "Грушницкий", "Абрезов", "Агабабов"
+            };
+            string[] nationalitys = 
+            {
+                "Чукча", "Бурят", "Канадец", "Казах", "Ариец", "Нанаец", "Славянин", "Чуваш", "Беларус", "Удмурд"
+            };
+            int minimalHeight = 160;
+            int maximalHeight = 200;
+            int minimalWeight = 65;
+            int maximalWeight = 100;
+            FullName =
+                lastNames[random.Next(0, lastNames.Length)] + " " +
+                firstNames[random.Next(0, firstNames.Length)] + " " +
+                secondNames[random.Next(0, secondNames.Length)];
+            Nationality = nationalitys[random.Next(0, nationalitys.Length)];
+            Height = random.Next(minimalHeight, maximalHeight);
+            Weight = random.Next(minimalWeight, maximalWeight);
+            IsPrisoned = random.NextDouble() >= 0.5;
+        }
+
+        public string FullName { get; private set; }
+        public int Height { get; private set; }
+        public int Weight { get; private set; }
+        public string Nationality { get; private set; }
+        public bool IsPrisoned { get; private set; }
+
+        public override string ToString()
+        {
+            return $"\n{FullName} \nРост: {Height} \nВес: {Weight} \nНациональность: {Nationality}";
+        }
+    }
+
+    class Repository
+    {
+        private Random _random = new Random();
+        private List<Criminal> _criminals = new List<Criminal>();
+
+        public Repository()
+        {
+            int criminalsCount = 100000;
+
+            for (int i = 0; i < criminalsCount; i++)
+            {
+                _criminals.Add(new Criminal(_random));
+            }
+        }
+
+        public void SearchForCriteries(int height, int weight, string nationality)
+        {
+            int resultsCount = 0;
+            var _searchResult = from Criminal criminal in _criminals 
+                                where criminal.Height == height && 
+                                criminal.Weight == weight &&
+                                criminal.Nationality.ToLower() == nationality.ToLower() &&
+                                criminal.IsPrisoned == false
+                                select criminal;
+
+            foreach (var criminal in _searchResult)
+            {
+                Console.WriteLine(criminal);
+                resultsCount++;
+            }
+
+            Console.WriteLine($"\nКол-во результатов: {resultsCount}");
+        }
+    }
+}
