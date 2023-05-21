@@ -8,24 +8,35 @@ namespace HomeWork
     {
         static void Main(string[] args)
         {
-            Repository repository = new Repository();
             int userInputHeight;
             int userInputWeight;
-            string userInputNationality;
+            int userInputNationality;
+            int minimalHeight = 160;
+            int maximalHeight = 200;
+            int minimalWeight = 65;
+            int maximalWeight = 100;
             bool isExit = false;
+            string[] nationalities = { "Чукча", "Бурят", "Канадец", "Казах", "Ариец", "Нанаец", "Славянин", "Чуваш", "Беларус", "Удмурд" };
+            Repository repository = new Repository(nationalities);
 
             while (isExit == false)
             {
                 Console.Clear();
 
                 Console.Write("Введите данные подозреваемого\n" +
-                              " Рост (160 - 200): ");
+                              $" Рост ({minimalHeight} - {maximalHeight}): ");
                 int.TryParse(Console.ReadLine(), out userInputHeight);
-                Console.Write(" Вес (65 - 100): ");
+                Console.Write($" Вес ({minimalWeight} - {maximalWeight}): ");
                 int.TryParse(Console.ReadLine(), out userInputWeight);
-                Console.Write(" Национальность " +
-                    "(Чукча, Бурят, Канадец, Казах, Ариец, Нанаец, Славянин, Чуваш, Беларус, Удмурд): ");
-                userInputNationality = Console.ReadLine();
+                Console.Write(" Национальность(номер) ");
+
+                for (int i = 0; i <nationalities.Length; i++)
+                {
+                    Console.Write($"({i}){nationalities[i]} ");
+                }
+
+                Console.Write(": ");
+                int.TryParse(Console.ReadLine(), out userInputNationality);
 
                 repository.SearchForCriteries(userInputHeight, userInputWeight, userInputNationality);
 
@@ -36,23 +47,21 @@ namespace HomeWork
 
     class Criminal
     {
-        public Criminal(Random random)
+        private string[] _nationalities;
+
+        public Criminal(Random random, string[] nationalities)
         {
-            string[] firstNames = 
+            string[] firstNames =
             {
                 "Иван", "Дмитрий", "Владимир", "Глеб", "Егор", "Максим", "Влад", "Олег", "Джардани", "Иоган"
             };
-            string[] secondNames = 
+            string[] secondNames =
             {
                 "Дмитриевич", "Иванович", "Александрович", "Владимирович", "Сергеевич", "Георгиевич", "Николаевич", "Олегович", "Йовановович", "Мансурович"
             };
-            string[] lastNames = 
+            string[] lastNames =
             {
                 "Чеботарев", "Петрович", "Минкин", "Устинов", "Синькевич", "Иванов", "Ионцев", "Грушницкий", "Абрезов", "Агабабов"
-            };
-            string[] nationalitys = 
-            {
-                "Чукча", "Бурят", "Канадец", "Казах", "Ариец", "Нанаец", "Славянин", "Чуваш", "Беларус", "Удмурд"
             };
             int minimalHeight = 160;
             int maximalHeight = 200;
@@ -62,21 +71,22 @@ namespace HomeWork
                 lastNames[random.Next(0, lastNames.Length)] + " " +
                 firstNames[random.Next(0, firstNames.Length)] + " " +
                 secondNames[random.Next(0, secondNames.Length)];
-            Nationality = nationalitys[random.Next(0, nationalitys.Length)];
+            Nationality = random.Next(0, nationalities.Length);
             Height = random.Next(minimalHeight, maximalHeight);
             Weight = random.Next(minimalWeight, maximalWeight);
             IsPrisoned = random.NextDouble() >= 0.5;
+            _nationalities = nationalities;
         }
 
         public string FullName { get; private set; }
         public int Height { get; private set; }
         public int Weight { get; private set; }
-        public string Nationality { get; private set; }
+        public int Nationality { get; private set; }
         public bool IsPrisoned { get; private set; }
 
         public override string ToString()
         {
-            return $"\n{FullName} \nРост: {Height} \nВес: {Weight} \nНациональность: {Nationality}";
+            return $"\n{FullName} \nРост: {Height} \nВес: {Weight} \nНациональность: {_nationalities[Nationality]}";
         }
     }
 
@@ -85,24 +95,24 @@ namespace HomeWork
         private Random _random = new Random();
         private List<Criminal> _criminals = new List<Criminal>();
 
-        public Repository()
+        public Repository(string[] nationalities)
         {
             int criminalsCount = 100000;
 
             for (int i = 0; i < criminalsCount; i++)
             {
-                _criminals.Add(new Criminal(_random));
+                _criminals.Add(new Criminal(_random, nationalities));
             }
         }
 
-        public void SearchForCriteries(int height, int weight, string nationality)
+        public void SearchForCriteries(int height, int weight, int nationality)
         {
-            var searchResult = from Criminal criminal in _criminals 
-                                where criminal.Height == height && 
-                                criminal.Weight == weight &&
-                                criminal.Nationality.ToLower() == nationality.ToLower() &&
-                                criminal.IsPrisoned == false
-                                select criminal;
+            var searchResult = from Criminal criminal in _criminals
+                               where criminal.Height == height &&
+                               criminal.Weight == weight &&
+                               criminal.Nationality == nationality &&
+                               criminal.IsPrisoned == false
+                               select criminal;
 
             ShowResults(searchResult.ToList());
         }
