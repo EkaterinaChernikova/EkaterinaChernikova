@@ -97,15 +97,21 @@ namespace HomeWork
 
         public void SearchForCriteries(int height, int weight, string nationality)
         {
-            int resultsCount = 0;
-            var _searchResult = from Criminal criminal in _criminals 
+            var searchResult = from Criminal criminal in _criminals 
                                 where criminal.Height == height && 
                                 criminal.Weight == weight &&
                                 criminal.Nationality.ToLower() == nationality.ToLower() &&
                                 criminal.IsPrisoned == false
                                 select criminal;
 
-            foreach (var criminal in _searchResult)
+            ShowResults(searchResult.ToList());
+        }
+
+        private void ShowResults(List<Criminal> results)
+        {
+            int resultsCount = 0;
+
+            foreach (Criminal criminal in results)
             {
                 Console.WriteLine(criminal);
                 resultsCount++;
