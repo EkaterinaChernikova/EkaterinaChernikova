@@ -1,0 +1,75 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Jail jail = new Jail();
+            string amnestyReason = "Антиправительственное";
+            Console.WriteLine("Список заключеных до амнистии: \n");
+            jail.ShowList();
+            jail.Amnesty(amnestyReason);
+            Console.WriteLine($"Список заключеных после амнистии({amnestyReason}): \n");
+            jail.ShowList();
+            Console.ReadKey();
+        }
+    }
+
+    class Jail
+    {
+        private List<Prisoner> _prisoners = new List<Prisoner>();
+
+        public Jail()
+        {
+            _prisoners.Add(new Prisoner("Мистер Руки Лезвия", "Серийный убийца"));
+            _prisoners.Add(new Prisoner("Маска Нож Утопец", "Маньяк"));
+            _prisoners.Add(new Prisoner("Клоун Шарик Канава", "Маньяк"));
+            _prisoners.Add(new Prisoner("Плащ Маска Нож", "Серийный убийца"));
+            _prisoners.Add(new Prisoner("Бензопила Поля Техас", "Массовое убийство"));
+            _prisoners.Add(new Prisoner("Клоун Велосипед Телевизор", "Похищение"));
+            _prisoners.Add(new Prisoner("Саркофаг Бинты Песок", "Антиправительственное"));
+            _prisoners.Add(new Prisoner("Лысый Безнос Палка", "Терроризм"));
+            _prisoners.Add(new Prisoner("Стекло Гурман Людоед", "Похищение"));
+            _prisoners.Add(new Prisoner("Голова Иглы Куб", "Маньяк"));
+            _prisoners.Add(new Prisoner("Черный Плащ Сила", "Антиправительственное"));
+        }
+
+        public void Amnesty(string amnestyReason)
+        {
+            var _amnestyResults = from Prisoner prisoner in _prisoners
+                                  where prisoner.Crime != amnestyReason
+                                  select prisoner;
+
+            _prisoners = _amnestyResults.ToList();
+        }
+
+        public void ShowList()
+        {
+            foreach (Prisoner prisoner in _prisoners)
+            {
+                Console.WriteLine(prisoner);
+            }
+        }
+    }
+
+    class Prisoner
+    {
+        public Prisoner(string fullName, string crime)
+        {
+            FullName = fullName;
+            Crime = crime;
+        }
+
+        public string FullName { get; private set; }
+        public string Crime { get; private set; }
+
+        public override string ToString()
+        {
+            return $" Краткое описание: {FullName}\n Причина заключения: {Crime}\n";
+        }
+    }
+}
