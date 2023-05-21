@@ -40,11 +40,7 @@ namespace HomeWork
 
         public void Amnesty(string amnestyReason)
         {
-            var _amnestyResults = from Prisoner prisoner in _prisoners
-                                  where prisoner.Crime != amnestyReason
-                                  select prisoner;
-
-            _prisoners = _amnestyResults.ToList();
+            _prisoners = _prisoners.Where(Prisoner => Prisoner.Crime != amnestyReason).ToList();
         }
 
         public void ShowList()
