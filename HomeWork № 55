@@ -1,0 +1,70 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Printer printer = new Printer();
+            List<Stew> stews = new List<Stew>()
+            {
+                new Stew("Классическая", DateTime.Parse("10.1995"), DateTime.Parse("10.1999")),
+                new Stew("Заморская", DateTime.Parse("06.2012"), DateTime.Parse("06.2016")),
+                new Stew("Конская", DateTime.Parse("08.1999"), DateTime.Parse("08.2003")),
+                new Stew("Свинная", DateTime.Parse("02.2019"), DateTime.Parse("02.2023")),
+                new Stew("Заморская", DateTime.Parse("09.2016"), DateTime.Parse("09.2019")),
+                new Stew("Классическая", DateTime.Parse("11.2021"), DateTime.Parse("11.2025")),
+                new Stew("Свинная", DateTime.Parse("03.2009"), DateTime.Parse("03.2013")),
+                new Stew("Свинная", DateTime.Parse("05.2015"), DateTime.Parse("05.2019")),
+                new Stew("Конская", DateTime.Parse("08.2022"), DateTime.Parse("08.2026")),
+                new Stew("Классическая", DateTime.Parse("01.2018"), DateTime.Parse("01.2022")),
+                new Stew("Свинная", DateTime.Parse("03.2022"), DateTime.Parse("03.2026")),
+                new Stew("Заморская", DateTime.Parse("04.2017"), DateTime.Parse("04.2017")),
+                new Stew("Классическая", DateTime.Parse("03.2021"), DateTime.Parse("03.2025")),
+                new Stew("Свинная", DateTime.Parse("06.2019"), DateTime.Parse("06.2023")),
+                new Stew("Конская", DateTime.Parse("12.2022"), DateTime.Parse("12.2026")),
+                new Stew("Заморская", DateTime.Parse("06.2021"), DateTime.Parse("06.2025")),
+                new Stew("Классическая", DateTime.Parse("04.2020"), DateTime.Parse("04.2024")),
+            };
+
+            Console.WriteLine(" Список имеющейся тушенки: ");
+            printer.PrintList(stews);
+            Console.WriteLine("\n Список просроченной тушенки: ");
+            printer.PrintList(stews.Where(stew => stew.ExpirationDate < DateTime.Now).ToList());
+            Console.ReadKey();
+        }
+    }
+
+    class Printer
+    {
+        public void PrintList(List<Stew> list)
+        {
+            foreach (Stew stew in list)
+            {
+                Console.WriteLine(stew);
+            }
+        }
+    }
+
+    class Stew
+    {
+        public Stew(string productName, DateTime dataOfProduction, DateTime expirationDate)
+        {
+            ProductName = productName;
+            DataOfProduction = dataOfProduction;
+            ExpirationDate = expirationDate;
+        }
+
+        public string ProductName { get; private set; }
+        public DateTime DataOfProduction { get; private set; }
+        public DateTime ExpirationDate { get; private set; }
+
+        public override string ToString()
+        {
+            return $"Наименование: {ProductName.PadRight(15)} Дата производства: {DataOfProduction.ToString("MM.yyyy").PadRight(10)} Срок годности: {ExpirationDate.ToString("MM.yyyy").PadRight(10)}";
+        }
+    }
+}
