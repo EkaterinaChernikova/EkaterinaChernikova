@@ -1,0 +1,74 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Printer printer = new Printer();
+            List<Player> players = new List<Player>()
+            {
+                new Player("ВоруюКитайцев", 75, 123),
+                new Player("ХиллВиноват", 52, 354),
+                new Player("ХиллНеВиноват", 90, 453),
+                new Player("ХлебушекАк47", 88, 756),
+                new Player("ДиванныйКритик", 1, 587),
+                new Player("УбийцаКитов", 75, 391),
+                new Player("Dinomight", 66, 346),
+                new Player("Fors-Абжор", 54, 653),
+                new Player("BonBezdno", 35, 294),
+                new Player("shuba-duba", 63, 100),
+                new Player("Белящь", 55, 621),
+                new Player("CatMarine", 71, 412),
+                new Player("Killer-2023", 5, 193),
+                new Player("ZlayaRozetka", 62, 111),
+                new Player("ShlangYbiyca", 15, 752)
+            };
+
+            int topCount = 3;
+
+            Console.WriteLine(" Список игроков: ");
+            printer.PrintList(players);
+            Console.WriteLine($"\n Топ {topCount} игроко по уровню: ");
+            List<Player> topLevel = players.OrderByDescending(player => player.Level).Take(topCount).ToList();
+            printer.PrintList(topLevel);
+            Console.WriteLine($"\n Топ {topCount} игроко по силе: ");
+            List<Player> topPower = players.OrderByDescending(player => player.Power).Take(topCount).ToList();
+            printer.PrintList(topPower);
+            Console.ReadKey();
+        }
+    }
+
+    class Printer
+    {
+        public void PrintList(List<Player> list)
+        {
+            foreach (Player player in list)
+            {
+                Console.WriteLine(player);
+            }
+        }
+    }
+
+    class Player
+    {
+        public Player(string nickName, int level, int power)
+        {
+            NickName = nickName;
+            Level = level;
+            Power = power;
+        }
+
+        public string NickName { get; private set; }
+        public int Level { get; private set; }
+        public int Power { get; private set; }
+
+        public override string ToString()
+        {
+            return $"Ник: {NickName.PadRight(20)} Уровень: {Level.ToString().PadRight(5)} Сила: {Power.ToString().PadRight(10)}";
+        }
+    }
+}
