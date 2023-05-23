@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            const string CommandSortForFullname = "1";
+            const string CommandSortForAge = "2";
+            const string CommandShowByDesease = "3";
+
+            Hospital hospital = new Hospital();
+            bool isExit = false;
+
+            while (isExit == false)
+            {
+                Console.Clear();
+                Console.WriteLine("Список пациентов: ");
+                hospital.ShowList();
+                Console.Write(
+                    $"\n {CommandSortForFullname}. Отсортировать по ФИО." +
+                    $"\n {CommandSortForAge}. Отсортировать по возрасту." +
+                    $"\n {CommandShowByDesease}. Показать больных с определённым заболеванием." +
+                    $"\n Ваш ввод: ");
+
+                switch (Console.ReadLine())
+                {
+                    case CommandSortForFullname:
+                        hospital.SortForFullname();
+                        break;
+
+                    case CommandSortForAge:
+                        hospital.SortForAge();
+                        break;
+
+                    case CommandShowByDesease:
+                        hospital.ShowByDesease();
+                        break;
+                }
+            }
+        }
+    }
+
+    class Hospital
+    {
+        private List<Patient> _patients = new List<Patient>();
+
+        public Hospital()
+        {
+            _patients.Add(new Patient("Иванов Иван Иванович", 22, "Грипп"));
+            _patients.Add(new Patient("Петровский Петр Владимирович", 25, "Чума"));
+            _patients.Add(new Patient("Чеботарёва Людмила Владимировна", 45, "Халера"));
+            _patients.Add(new Patient("Устинов Глеб Владимирович", 33, "Грипп"));
+            _patients.Add(new Patient("Пушкин Александр Сергеевич", 25, "Близорукость"));
+            _patients.Add(new Patient("Ионцев Влад Николаевич", 19, "Грипп"));
+            _patients.Add(new Patient("Литвинков Михаил Олегович", 53, "Дальтонизм"));
+            _patients.Add(new Patient("Аль Сабахи Фуад Ибн Магеран", 27, "Дальтонизм"));
+            _patients.Add(new Patient("Брындин Вячеслав Сергеевич", 55, "Чума"));
+            _patients.Add(new Patient("Мудиомукуту Ля Пьер Нарцисс", 30, "Халера"));
+            _patients.Add(new Patient("Ганз Шреденгер", 65, "Близорукость"));
+        }
+
+        public void ShowList()
+        {
+            Console.WriteLine($"{"ФИО".PadRight(40)} {"Возраст".PadRight(10)} Диагноз\n");
+
+            foreach (Patient patient in _patients)
+            {
+                Console.WriteLine(patient);
+            }
+        }
+
+        public void SortForFullname()
+        {
+            _patients = _patients.OrderBy(patient => patient.FullName).ToList();
+        }
+
+        public void SortForAge()
+        {
+            _patients = _patients.OrderBy(patient => patient.Age).ToList();
+        }
+
+        public void ShowByDesease()
+        {
+            Console.Write("\n Введите диагноз для поиска: ");
+            string userInput = Console.ReadLine();
+            var sortedPatients = _patients.Where(patient => patient.Disease.ToLower() == userInput.ToLower());
+            Console.WriteLine("\n Результаты поиска: ");
+
+            foreach (Patient patient in sortedPatients)
+            {
+                Console.WriteLine(patient);
+            }
+
+            Console.ReadKey();
+        }
+    }
+
+    class Patient
+    {
+        public Patient(string fullName, int age, string diasease)
+        {
+            FullName = fullName;
+            Age = age;
+            Disease = diasease;
+        }
+
+        public string FullName { get; private set; }
+        public int Age { get; private set; }
+        public string Disease { get; private set; }
+
+        public override string ToString()
+        {
+            return $"{FullName.PadRight(40)} {Age.ToString().PadRight(10)} {Disease}";
+        }
+    }
+}
