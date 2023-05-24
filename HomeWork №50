@@ -8,7 +8,7 @@ namespace HomeWork
         static void Main(string[] args)
         {
             CarService carService = new CarService();
-            carService.StartWork();
+            carService.BeginWork();
         }
     }
 
@@ -24,7 +24,7 @@ namespace HomeWork
             _werehouse = new Werehouse(_random);
         }
 
-        public void StartWork()
+        public void BeginWork()
         {
             const string CommandRepair = "1";
             const string CommandRefuse = "2";
@@ -56,9 +56,11 @@ namespace HomeWork
                     case CommandRepair:
                         Repair();
                         break;
+
                     case CommandRefuse:
                         Refuse();
                         break;
+
                     case CommandExit:
                         isExit = true;
                         break;
@@ -84,9 +86,6 @@ namespace HomeWork
 
         private void Repair()
         {
-            const string CommandYes = "1";
-            const string CommandNo = "2";
-
             string userInput;
             int partNumber = 0;
             int priceForWork = 0;
@@ -106,48 +105,66 @@ namespace HomeWork
                 && partNumber < maximalPartNumber)
             {
                 priceForWork = _werehouse.GetPrice(partNumber) * priceRatio1 / priceRatio2;
+                _werehouse.RemovePart(partNumber);
 
                 if (_client.GetCarPartNumber() == partNumber)
                 {
-                    if (_client.Money >= priceForWork)
-                    {
-                        _client.Pay(priceForWork);
-                        _money += priceForWork;
-                        Console.WriteLine(" Клиент расплатился за работу, можно приступать к ремонту.");
-                        _werehouse.RemovePart(partNumber);
-                        Console.WriteLine($"\n Вы заметили сломанную деталь №{_client.GetCarPartNumber()} на деталь №{partNumber}.");
-                        _client.RemoveCarBreackDown();
-                        Console.WriteLine(" Ремонт прошел успешно, клиент доволен.");
-                        _client = null;
-                    }
-                    else
-                    {
-                        Console.WriteLine(" Клиент не может расплатился за работу, уходит ругаясь матом.");
-                        _client = null;
-                    }
+                    ReplaceCorrectParts(partNumber, priceForWork);
                 }
                 else
                 {
-                    Console.WriteLine(" Вы перепутали детали, клиент не доволен. Вас ждёт штраф! Клиент ушёл в другой сервис.");
-                    _werehouse.RemovePart(partNumber);
-                    ApplyPenalty(priceForWork);
-                    _client = null;
+                    ReplaceIncorrectParts(partNumber, priceForWork);
                 }
             }
             else if (partNumber >= minimalPartNumber && partNumber < maximalPartNumber)
             {
-                Console.Write("\n Данной детали на складе не обнаружено.\n" +
-                    "Приобрести недостающую деталь?\n" +
-                    $"{CommandYes}. Да.\n" +
-                    $"{CommandNo}. Нет.\n" +
-                    $"Ваш выбор: ");
+                AskAboutNewPart(partNumber);
+            }
+        }
 
-                userInput = Console.ReadLine();
+        private void ReplaceCorrectParts(int partNumber, int priceForWork)
+        {
+            if (_client.Money >= priceForWork)
+            {
+                _client.Pay(priceForWork);
+                _money += priceForWork;
+                Console.WriteLine(" Клиент расплатился за работу, можно приступать к ремонту.");
+                Console.WriteLine($"\n Вы заметили сломанную деталь №{_client.GetCarPartNumber()} на деталь №{partNumber}.");
+                _client.RemoveCarBreackDown();
+                Console.WriteLine(" Ремонт прошел успешно, клиент доволен.");
+                _client = null;
+            }
+            else
+            {
+                Console.WriteLine(" Клиент не может расплатился за работу, уходит ругаясь матом.");
+                _werehouse.AddCarPart(partNumber);
+                _client = null;
+            }
+        }
 
-                if (userInput == CommandYes)
-                {
-                    BuyCarPart(partNumber);
-                }
+        private void ReplaceIncorrectParts(int partNumber, int priceForWork)
+        {
+            Console.WriteLine(" Вы перепутали детали, клиент не доволен. Вас ждёт штраф! Клиент ушёл в другой сервис.");
+            ApplyPenalty(priceForWork);
+            _client = null;
+        }
+
+        private void AskAboutNewPart(int partNumber)
+        {
+            string userInputYes = "1";
+            string userInputNo = "2";
+
+            Console.Write("\n Данной детали на складе не обнаружено.\n" +
+                   "Приобрести недостающую деталь?\n" +
+                   $"{userInputYes}. Да.\n" +
+                   $"{userInputNo}. Нет.\n" +
+                   $"Ваш выбор: ");
+
+            string userInput = Console.ReadLine();
+
+            if (userInput == userInputYes)
+            {
+                BuyCarPart(partNumber);
             }
         }
 
@@ -203,7 +220,7 @@ namespace HomeWork
                 if (_storage[i].PartNumber == partNumber)
                 {
                     _storage[i].RemovePart();
-                    
+
                     if (_storage[i].PartsCount == 0)
                     {
                         _storage.RemoveAt(i);
@@ -236,7 +253,7 @@ namespace HomeWork
             {
                 _storage[GetCellIndex(partNumber)].AddPart(partNumber);
             }
-            else 
+            else
             {
                 _storage.Add(new StorageCell(partNumber));
                 SortStorage();
