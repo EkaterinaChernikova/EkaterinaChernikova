@@ -1,0 +1,75 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Printer printer = new Printer();
+            List<Soldier> soldiers = new List<Soldier>()
+            {
+                new Soldier("Асван", "Пистолет", "Рядовой", 12),
+                new Soldier("Валидор", "Нож", "Сержант", 32),
+                new Soldier("Пеотр", "Автомат", "Капитан", 25),
+                new Soldier("Торниал", "Револьвер", "Ефрейтор", 53),
+                new Soldier("Дрангин", "Дробовик", "Рядовой", 25),
+                new Soldier("Ролифар", "Винтовка", "Ефрейтор", 63),
+                new Soldier("Фарлин", "РПГ-7", "Рядовой", 33),
+                new Soldier("Лиогер", "Мачете", "Сержант", 45),
+                new Soldier("Гробан", "Катана", "Рядовой", 17),
+                new Soldier("Наритол", "Граната", "Ефрейтор", 28)
+            };
+
+            Console.WriteLine(" Список содат: ");
+            printer.PrintList(soldiers);
+
+            Console.WriteLine("\n Список солдат по имени и званию: ");
+            printer.PrintArray(soldiers.Select(soldier => $"Имя: {soldier.Name, 10} Звание: {soldier.Title, 10}").ToArray());
+
+            Console.ReadKey();
+        }
+    }
+
+    class Printer
+    {
+        public void PrintList(List<Soldier> soldiers)
+        {
+            foreach (Soldier soldier in soldiers)
+            {
+                Console.WriteLine(soldier);
+            }
+        }
+
+        public void PrintArray(string[] array)
+        {
+            foreach (string line in array)
+            {
+                Console.WriteLine(line);
+            }
+        }
+    }
+
+    class Soldier
+    {
+        public Soldier(string name, string weapon, string title, int dutyTime)
+        {
+            Name = name;
+            Weapon = weapon;
+            Title = title;
+            DutyTime = dutyTime;
+        }
+
+        public string Name { get; private set; }
+        public string Weapon { get; private set; }
+        public string Title { get; private set; }
+        public int DutyTime { get; private set; }
+
+        public override string ToString()
+        {
+            return $"Имя: {Name, 10} Вооружение: {Weapon, 10} Звание: {Title, 10} Срок службы: {DutyTime, 5}";
+        }
+    }
+}
