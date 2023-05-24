@@ -1,0 +1,82 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HomeWork
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Printer printer = new Printer();
+            List<Soldier> squad1 = new List<Soldier>()
+            {
+                new Soldier("Асван", "Иванович", "Бурый"),
+                new Soldier("Валидор", "Петрович", "Ионцев"),
+                new Soldier("Богдан", "Сергеевич", "Богданов"),
+                new Soldier("Олег", "Дмитриевич", "Оноприйчук"),
+                new Soldier("Сергей", "Николаевич", "Чеботарев"),
+                new Soldier("Дмитрий", "Олегович", "Минкин"),
+                new Soldier("Иван", "Максимович", "Богров"),
+                new Soldier("Петр", "Евгеньевич", "Устинов"),
+                new Soldier("Филлип", "Сергеевич", "Иванов"),
+                new Soldier("Егор", "Александрович", "Береговой")
+            };
+
+            List<Soldier> squad2 = new List<Soldier>()
+            {
+                new Soldier("Леонид", "Викторович", "Шлапак"),
+                new Soldier("Георгий", "Валентинович", "Видак"),
+                new Soldier("Никита", "Сергеевич", "Горшан"),
+                new Soldier("Лаврентий", "Шинилович", "Лагман"),
+                new Soldier("Матвей", "Викторович", "Стебаков"),
+                new Soldier("Влад", "Денисович", "Романов"),
+                new Soldier("Михаил", "Валерьевич", "Котиков"),
+                new Soldier("Тимофей", "Владимирович", "Рванецкий"),
+                new Soldier("Максим", "Михайлович", "Шпак"),
+                new Soldier("Кирилл", "Георгиевич", "Литвинов"),
+            };
+
+            Console.WriteLine(" Список солдат № 1: ");
+            printer.PrintList(squad1);
+
+            Console.WriteLine("\n Список солдат № 2: ");
+            printer.PrintList(squad2);
+
+            Console.WriteLine("\n Список солдат № 2 с переводом из первого отряда:  ");
+            printer.PrintList(squad2.Union(squad1.Where(soldier => soldier.LastName.StartsWith("Б"))).ToList());
+
+            Console.ReadKey();
+        }
+    }
+
+    class Printer
+    {
+        public void PrintList(List<Soldier> soldiers)
+        {
+            foreach (Soldier soldier in soldiers)
+            {
+                Console.WriteLine(soldier);
+            }
+        }
+    }
+
+    class Soldier
+    {
+        public Soldier(string firstname, string secondName, string lastName )
+        {
+            FirstName = firstname;
+            SecondName = secondName;
+            LastName = lastName;
+        }
+
+        public string FirstName { get; private set; }
+        public string SecondName { get; private set; }
+        public string LastName { get; private set; }
+
+        public override string ToString()
+        {
+            return $"ФИО: {LastName} {FirstName} {SecondName}";
+        }
+    }
+}
