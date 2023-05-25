@@ -8,7 +8,7 @@ namespace HomeWork
         static void Main(string[] args)
         {
             CarService carService = new CarService();
-            carService.BeginWork();
+            carService.Work();
         }
     }
 
@@ -16,21 +16,21 @@ namespace HomeWork
     {
         private int _money = 10000;
         private Random _random = new Random();
-        private Werehouse _werehouse;
-        private Client _client = null;
+        private Warehouse _warehouse;
 
         public CarService()
         {
-            _werehouse = new Werehouse(_random);
+            _warehouse = new Warehouse(_random);
         }
 
-        public void BeginWork()
+        public void Work()
         {
             const string CommandRepair = "1";
             const string CommandRefuse = "2";
             const string CommandExit = "3";
             string userInput;
             bool isExit = false;
+            Client client = null;
 
             while (isExit == false)
             {
@@ -39,11 +39,15 @@ namespace HomeWork
                                  $"Средства сервиса {_money}\n" +
                                  $"Детали имеющиеся на складе:\n");
 
-                _werehouse.ShowPartList();
-                CreateRandomClient();
+                _warehouse.ShowPartList();
+
+                if (client == null)
+                {
+                    client = new Client(_random, _warehouse.MinimalPartIndex, _warehouse.MaximalPartIndex);
+                }
 
                 Console.Write("\n К вам в сервис пожаловал клиент, \n" +
-                    $"в его машине сломана деталь №{_client.GetCarPartNumber()}:\n" +
+                    $"в его машине сломана деталь №{client.GetPartNumber()}:\n" +
                     $"{CommandRepair}. Заменить сломанную деталь. \n" +
                     $"{CommandRefuse}. Отказать в обслуживании.\n" +
                     $"{CommandExit}. Уволиться.\n" +
@@ -54,11 +58,11 @@ namespace HomeWork
                 switch (userInput)
                 {
                     case CommandRepair:
-                        Repair();
+                        Repair(client);
                         break;
 
                     case CommandRefuse:
-                        Refuse();
+                        Refuse(client);
                         break;
 
                     case CommandExit:
@@ -76,15 +80,7 @@ namespace HomeWork
             }
         }
 
-        public void CreateRandomClient()
-        {
-            if (_client == null)
-            {
-                _client = new Client(_random);
-            }
-        }
-
-        private void Repair()
+        private void Repair(Client client)
         {
             string userInput;
             int partNumber = 0;
@@ -100,20 +96,20 @@ namespace HomeWork
             userInput = Console.ReadLine();
             int.TryParse(userInput, out partNumber);
 
-            if (_werehouse.IsContainsPart(partNumber) == true
+            if (_warehouse.IsContainsPart(partNumber) == true
                 && partNumber >= minimalPartNumber
                 && partNumber < maximalPartNumber)
             {
-                priceForWork = _werehouse.GetPrice(partNumber) * priceRatio1 / priceRatio2;
-                _werehouse.RemovePart(partNumber);
+                priceForWork = _warehouse.GetPrice(partNumber) * priceRatio1 / priceRatio2;
+                _warehouse.RemovePart(partNumber);
 
-                if (_client.GetCarPartNumber() == partNumber)
+                if (client.GetPartNumber() == partNumber)
                 {
-                    ReplaceCorrectParts(partNumber, priceForWork);
+                    ReplaceCorrectParts(partNumber, priceForWork, client);
                 }
                 else
                 {
-                    ReplaceIncorrectParts(partNumber, priceForWork);
+                    ReplaceIncorrectParts(partNumber, priceForWork, client);
                 }
             }
             else if (partNumber >= minimalPartNumber && partNumber < maximalPartNumber)
@@ -122,42 +118,41 @@ namespace HomeWork
             }
         }
 
-        private void ReplaceCorrectParts(int partNumber, int priceForWork)
+        private void ReplaceCorrectParts(int partNumber, int priceForWork, Client client)
         {
-            if (_client.Money >= priceForWork)
+            if (client.Money >= priceForWork)
             {
-                _client.Pay(priceForWork);
+                client.Pay(priceForWork);
                 _money += priceForWork;
                 Console.WriteLine(" Клиент расплатился за работу, можно приступать к ремонту.");
-                Console.WriteLine($"\n Вы заметили сломанную деталь №{_client.GetCarPartNumber()} на деталь №{partNumber}.");
-                _client.RemoveCarBreackDown();
+                Console.WriteLine($"\n Вы заметили сломанную деталь №{client.GetPartNumber()} на деталь №{partNumber}.");
+                client.RemoveBreackDown();
                 Console.WriteLine(" Ремонт прошел успешно, клиент доволен.");
-                _client = null;
+                client = null;
             }
             else
             {
                 Console.WriteLine(" Клиент не может расплатился за работу, уходит ругаясь матом.");
-                _werehouse.AddCarPart(partNumber);
-                _client = null;
+                _warehouse.AddPart(partNumber);
+                client = null;
             }
         }
 
-        private void ReplaceIncorrectParts(int partNumber, int priceForWork)
+        private void ReplaceIncorrectParts(int partNumber, int priceForWork, Client client)
         {
             Console.WriteLine(" Вы перепутали детали, клиент не доволен. Вас ждёт штраф! Клиент ушёл в другой сервис.");
             ApplyPenalty(priceForWork);
-            _client = null;
+            client = null;
         }
 
         private void AskAboutNewPart(int partNumber)
         {
             string userInputYes = "1";
-            string userInputNo = "2";
 
             Console.Write("\n Данной детали на складе не обнаружено.\n" +
                    "Приобрести недостающую деталь?\n" +
                    $"{userInputYes}. Да.\n" +
-                   $"{userInputNo}. Нет.\n" +
+                   $"2. Нет (любой другой ввод).\n" +
                    $"Ваш выбор: ");
 
             string userInput = Console.ReadLine();
@@ -175,7 +170,7 @@ namespace HomeWork
             if (newPart.Price <= _money)
             {
                 _money -= newPart.Price;
-                _werehouse.AddCarPart(partNumber);
+                _warehouse.AddPart(partNumber);
                 Console.WriteLine(" Деталь успешно приобретена.");
             }
             else
@@ -184,11 +179,11 @@ namespace HomeWork
             }
         }
 
-        private void Refuse()
+        private void Refuse(Client client)
         {
             int standartPenalty = 500;
             ApplyPenalty(standartPenalty);
-            _client = null;
+            client = null;
             Console.WriteLine($" Вы отказались обслуживать, вас оштрафовалина {standartPenalty}, клиент ушел недовольный.");
         }
 
@@ -198,35 +193,38 @@ namespace HomeWork
         }
     }
 
-    class Werehouse
+    class Warehouse
     {
         private int _capacity = 100;
-        private List<StorageCell> _storage = new List<StorageCell>();
+        private List<StorageCell> _cells = new List<StorageCell>();
 
-        public Werehouse(Random random)
+        public Warehouse(Random random)
         {
             for (int i = 0; i < _capacity; i++)
             {
-                CarPart newCarPart = new CarPart(random);
+                CarPart newCarPart = new CarPart(random.Next(MinimalPartIndex, MaximalPartIndex));
 
-                AddCarPart(newCarPart.Number);
+                AddPart(newCarPart.Number);
             }
         }
 
+        public int MinimalPartIndex { get; private set; } = 1;
+        public int MaximalPartIndex { get; private set; } = 25;
+
         public void RemovePart(int partNumber)
         {
-            for (int i = 0; i < _storage.Count; i++)
+            for (int i = 0; i < _cells.Count; i++)
             {
-                if (_storage[i].PartNumber == partNumber)
+                if (_cells[i].PartNumber == partNumber)
                 {
-                    _storage[i].RemovePart();
+                    _cells[i].RemovePart();
 
-                    if (_storage[i].PartsCount == 0)
+                    if (_cells[i].PartsCount == 0)
                     {
-                        _storage.RemoveAt(i);
+                        _cells.RemoveAt(i);
                     }
 
-                    i = _storage.Count;
+                    i = _cells.Count;
                 }
             }
         }
@@ -235,34 +233,34 @@ namespace HomeWork
         {
             int price = 0;
 
-            for (int i = 0; i < _storage.Count; i++)
+            for (int i = 0; i < _cells.Count; i++)
             {
-                if (_storage[i].PartNumber == partNumber)
+                if (_cells[i].PartNumber == partNumber)
                 {
-                    price = _storage[i].PartPrice;
-                    i = _storage.Count;
+                    price = _cells[i].PartPrice;
+                    i = _cells.Count;
                 }
             }
 
             return price;
         }
 
-        public void AddCarPart(int partNumber)
+        public void AddPart(int partNumber)
         {
             if (IsContainsPart(partNumber) == true)
             {
-                _storage[GetCellIndex(partNumber)].AddPart(partNumber);
+                _cells[GetCellIndex(partNumber)].AddPart(partNumber);
             }
             else
             {
-                _storage.Add(new StorageCell(partNumber));
-                SortStorage();
+                _cells.Add(new StorageCell(partNumber));
+                SortsCells();
             }
         }
 
         public void ShowPartList()
         {
-            foreach (StorageCell cell in _storage)
+            foreach (StorageCell cell in _cells)
             {
                 cell.ShowInfo();
             }
@@ -272,7 +270,7 @@ namespace HomeWork
         {
             bool isFind = false;
 
-            foreach (StorageCell cell in _storage)
+            foreach (StorageCell cell in _cells)
             {
                 if (cell.PartNumber == number)
                 {
@@ -285,9 +283,9 @@ namespace HomeWork
 
         private int GetCellIndex(int partNumber)
         {
-            for (int i = 0; i < _storage.Count; i++)
+            for (int i = 0; i < _cells.Count; i++)
             {
-                if (_storage[i].PartNumber == partNumber)
+                if (_cells[i].PartNumber == partNumber)
                 {
                     return i;
                 }
@@ -296,19 +294,19 @@ namespace HomeWork
             return 0;
         }
 
-        private void SortStorage()
+        private void SortsCells()
         {
             StorageCell buffer;
 
-            for (int i = 0; i < _storage.Count; i++)
+            for (int i = 0; i < _cells.Count; i++)
             {
-                for (int j = i; j < _storage.Count; j++)
+                for (int j = i; j < _cells.Count; j++)
                 {
-                    if (_storage[i].PartNumber > _storage[j].PartNumber)
+                    if (_cells[i].PartNumber > _cells[j].PartNumber)
                     {
-                        buffer = _storage[i];
-                        _storage[i] = _storage[j];
-                        _storage[j] = buffer;
+                        buffer = _cells[i];
+                        _cells[i] = _cells[j];
+                        _cells[j] = buffer;
                     }
                 }
             }
@@ -317,7 +315,7 @@ namespace HomeWork
 
     class StorageCell
     {
-        private List<CarPart> _cell = new List<CarPart>();
+        private List<CarPart> _parts = new List<CarPart>();
 
         public StorageCell(int partNumber)
         {
@@ -334,14 +332,14 @@ namespace HomeWork
 
         public void AddPart(int partNumber)
         {
-            _cell.Add(new CarPart(partNumber));
-            PartsCount = _cell.Count;
+            _parts.Add(new CarPart(partNumber));
+            PartsCount = _parts.Count;
         }
 
         public void RemovePart()
         {
-            _cell.RemoveAt(0);
-            PartsCount = _cell.Count;
+            _parts.RemoveAt(0);
+            PartsCount = _parts.Count;
         }
 
         public void ShowInfo()
@@ -354,9 +352,9 @@ namespace HomeWork
     {
         private CarPart _breackdown;
 
-        public Car(Random random)
+        public Car(int partIndex)
         {
-            _breackdown = new CarPart(random);
+            _breackdown = new CarPart(partIndex);
         }
 
         public void RemoveBreackDown()
@@ -374,12 +372,12 @@ namespace HomeWork
     {
         private Car _car;
 
-        public Client(Random random)
+        public Client(Random random, int minimalPartIndex, int maximalPartIndex)
         {
             int minimalMoney = 5000;
             int maximalMoney = 15000;
 
-            _car = new Car(random);
+            _car = new Car(random.Next(minimalPartIndex, maximalPartIndex));
             Money = random.Next(minimalMoney, maximalMoney);
         }
 
@@ -390,12 +388,12 @@ namespace HomeWork
             Money -= price;
         }
 
-        public void RemoveCarBreackDown()
+        public void RemoveBreackDown()
         {
             _car.RemoveBreackDown();
         }
 
-        public int GetCarPartNumber()
+        public int GetPartNumber()
         {
             return _car.GetPartNumber();
         }
@@ -403,22 +401,13 @@ namespace HomeWork
 
     class CarPart
     {
-        public CarPart(Random random)
-        {
-            int minimalPartNumber = 1;
-            int maximalPartNumber = 25;
-
-            Number = random.Next(minimalPartNumber, maximalPartNumber);
-            Price = Number * PartPriceRate;
-        }
-
         public CarPart(int partNumber)
         {
             Number = partNumber;
-            Price = Number * PartPriceRate;
+            Price = Number * PriceRate;
         }
 
-        public int PartPriceRate { get; private set; } = 500;
+        public int PriceRate { get; private set; } = 500;
         public int Price { get; private set; }
         public int Number { get; private set; }
     }
