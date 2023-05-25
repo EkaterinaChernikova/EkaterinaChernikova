@@ -41,7 +41,7 @@ namespace HomeWork
 
                 _warehouse.ShowPartList();
 
-                if (client == null)
+                if (client == null || client.isLeave == true)
                 {
                     client = new Client(_random, _warehouse.MinimalPartIndex, _warehouse.MaximalPartIndex);
                 }
@@ -128,13 +128,13 @@ namespace HomeWork
                 Console.WriteLine($"\n Вы заметили сломанную деталь №{client.GetPartNumber()} на деталь №{partNumber}.");
                 client.RemoveBreackDown();
                 Console.WriteLine(" Ремонт прошел успешно, клиент доволен.");
-                client = null;
+                client.Leave();
             }
             else
             {
                 Console.WriteLine(" Клиент не может расплатился за работу, уходит ругаясь матом.");
                 _warehouse.AddPart(partNumber);
-                client = null;
+                client.Leave();
             }
         }
 
@@ -142,7 +142,7 @@ namespace HomeWork
         {
             Console.WriteLine(" Вы перепутали детали, клиент не доволен. Вас ждёт штраф! Клиент ушёл в другой сервис.");
             ApplyPenalty(priceForWork);
-            client = null;
+            client.Leave();
         }
 
         private void AskAboutNewPart(int partNumber)
@@ -183,7 +183,7 @@ namespace HomeWork
         {
             int standartPenalty = 500;
             ApplyPenalty(standartPenalty);
-            client = null;
+            client.Leave();
             Console.WriteLine($" Вы отказались обслуживать, вас оштрафовалина {standartPenalty}, клиент ушел недовольный.");
         }
 
@@ -382,6 +382,7 @@ namespace HomeWork
         }
 
         public int Money { get; private set; }
+        public bool isLeave { get; private set; }
 
         public void Pay(int price)
         {
@@ -396,6 +397,11 @@ namespace HomeWork
         public int GetPartNumber()
         {
             return _car.GetPartNumber();
+        }
+
+        public void Leave()
+        {
+            isLeave = true;
         }
     }
 
