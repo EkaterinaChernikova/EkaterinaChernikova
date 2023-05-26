@@ -37,14 +37,22 @@ namespace HomeWork
                 new Soldier("Кирилл", "Георгиевич", "Литвинов"),
             };
 
-            Console.WriteLine(" Список солдат № 1: ");
+            Console.WriteLine(" До перевода" +
+                "\n Список солдат № 1: ");
             printer.PrintList(squad1);
 
             Console.WriteLine("\n Список солдат № 2: ");
             printer.PrintList(squad2);
 
-            Console.WriteLine("\n Список солдат № 2 с переводом из первого отряда:  ");
-            printer.PrintList(squad2.Union(squad1.Where(soldier => soldier.LastName.StartsWith("Б"))).ToList());
+            squad2 = squad2.Union(squad1.Where(soldier => soldier.LastName.StartsWith("Б"))).ToList();
+            squad1 = squad1.Except(squad2).ToList();
+
+            Console.WriteLine("\n После перевода" +
+                "\n Список солдат № 1: ");
+            printer.PrintList(squad1);
+
+            Console.WriteLine("\n Список солдат № 2: ");
+            printer.PrintList(squad2);
 
             Console.ReadKey();
         }
@@ -63,7 +71,7 @@ namespace HomeWork
 
     class Soldier
     {
-        public Soldier(string firstname, string secondName, string lastName )
+        public Soldier(string firstname, string secondName, string lastName)
         {
             FirstName = firstname;
             SecondName = secondName;
