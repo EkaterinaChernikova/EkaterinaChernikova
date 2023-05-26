@@ -27,7 +27,12 @@ namespace HomeWork
             printer.PrintList(soldiers);
 
             Console.WriteLine("\n Список солдат по имени и званию: ");
-            printer.PrintArray(soldiers.Select(soldier => $"Имя: {soldier.Name, 10} Звание: {soldier.Title, 10}").ToArray());
+            var soldiersByNameAndTitle = soldiers.Select(soldier => new { soldier.Name, soldier.Title });
+
+            foreach (var soldier in soldiersByNameAndTitle)
+            {
+                Console.WriteLine($"Имя: {soldier.Name,10} Звание: {soldier.Title,10}");
+            }
 
             Console.ReadKey();
         }
@@ -40,14 +45,6 @@ namespace HomeWork
             foreach (Soldier soldier in soldiers)
             {
                 Console.WriteLine(soldier);
-            }
-        }
-
-        public void PrintArray(string[] array)
-        {
-            foreach (string line in array)
-            {
-                Console.WriteLine(line);
             }
         }
     }
@@ -69,7 +66,7 @@ namespace HomeWork
 
         public override string ToString()
         {
-            return $"Имя: {Name, 10} Вооружение: {Weapon, 10} Звание: {Title, 10} Срок службы: {DutyTime, 5}";
+            return $"Имя: {Name,10} Вооружение: {Weapon,10} Звание: {Title,10} Срок службы: {DutyTime,5}";
         }
     }
 }
