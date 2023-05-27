@@ -41,7 +41,7 @@ namespace HomeWork
 
                 _warehouse.ShowPartList();
 
-                if (client == null || client.isLeave == true)
+                if (client == null || client.IsLeave == true)
                 {
                     client = new Client(_random, _warehouse.MinimalPartIndex, _warehouse.MaximalPartIndex);
                 }
@@ -114,7 +114,7 @@ namespace HomeWork
             }
             else if (partNumber >= minimalPartNumber && partNumber < maximalPartNumber)
             {
-                AskAboutNewPart(partNumber);
+                BuyNewPart(partNumber);
             }
         }
 
@@ -145,7 +145,7 @@ namespace HomeWork
             client.Leave();
         }
 
-        private void AskAboutNewPart(int partNumber)
+        private void BuyNewPart(int partNumber)
         {
             string userInputYes = "1";
 
@@ -382,7 +382,7 @@ namespace HomeWork
         }
 
         public int Money { get; private set; }
-        public bool isLeave { get; private set; }
+        public bool IsLeave { get; private set; }
 
         public void Pay(int price)
         {
@@ -401,7 +401,7 @@ namespace HomeWork
 
         public void Leave()
         {
-            isLeave = true;
+            IsLeave = true;
         }
     }
 
