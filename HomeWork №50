@@ -15,12 +15,11 @@ namespace HomeWork
     class CarService
     {
         private int _money = 10000;
-        private Random _random = new Random();
         private Warehouse _warehouse;
 
         public CarService()
         {
-            _warehouse = new Warehouse(_random);
+            _warehouse = new Warehouse();
         }
 
         public void Work()
@@ -43,7 +42,7 @@ namespace HomeWork
 
                 if (client == null || client.IsLeave == true)
                 {
-                    client = new Client(_random, _warehouse.MinimalPartIndex, _warehouse.MaximalPartIndex);
+                    client = new Client();
                 }
 
                 Console.Write("\n К вам в сервис пожаловал клиент, \n" +
@@ -87,8 +86,6 @@ namespace HomeWork
             int priceForWork = 0;
             int priceRatio1 = 4;
             int priceRatio2 = 3;
-            int minimalPartNumber = 1;
-            int maximalPartNumber = 25;
 
             Console.Write("\n На какую деталь заменить сломанную?\n" +
                 " Ваш ввод: ");
@@ -96,9 +93,7 @@ namespace HomeWork
             userInput = Console.ReadLine();
             int.TryParse(userInput, out partNumber);
 
-            if (_warehouse.IsContainsPart(partNumber) == true
-                && partNumber >= minimalPartNumber
-                && partNumber < maximalPartNumber)
+            if (_warehouse.IsContainsPart(partNumber) == true)
             {
                 priceForWork = _warehouse.GetPrice(partNumber) * priceRatio1 / priceRatio2;
                 _warehouse.RemovePart(partNumber);
@@ -112,7 +107,7 @@ namespace HomeWork
                     ReplaceIncorrectParts(partNumber, priceForWork, client);
                 }
             }
-            else if (partNumber >= minimalPartNumber && partNumber < maximalPartNumber)
+            else
             {
                 BuyNewPart(partNumber);
             }
@@ -125,7 +120,7 @@ namespace HomeWork
                 client.Pay(priceForWork);
                 _money += priceForWork;
                 Console.WriteLine(" Клиент расплатился за работу, можно приступать к ремонту.");
-                Console.WriteLine($"\n Вы заметили сломанную деталь №{client.GetPartNumber()} на деталь №{partNumber}.");
+                Console.WriteLine($"\n Вы заменили сломанную деталь №{client.GetPartNumber()} на деталь №{partNumber}.");
                 client.RemoveBreackDown();
                 Console.WriteLine(" Ремонт прошел успешно, клиент доволен.");
                 client.Leave();
@@ -165,7 +160,7 @@ namespace HomeWork
 
         private void BuyCarPart(int partNumber)
         {
-            CarPart newPart = new CarPart(partNumber);
+            CarPart newPart = Factory.CreateNewPart(partNumber);
 
             if (newPart.Price <= _money)
             {
@@ -184,7 +179,7 @@ namespace HomeWork
             int standartPenalty = 500;
             ApplyPenalty(standartPenalty);
             client.Leave();
-            Console.WriteLine($" Вы отказались обслуживать, вас оштрафовалина {standartPenalty}, клиент ушел недовольный.");
+            Console.WriteLine($" Вы отказались обслуживать, вас оштрафовали на {standartPenalty}, клиент ушел недовольный.");
         }
 
         private void ApplyPenalty(int penalty)
@@ -198,18 +193,15 @@ namespace HomeWork
         private int _capacity = 100;
         private List<StorageCell> _cells = new List<StorageCell>();
 
-        public Warehouse(Random random)
+        public Warehouse()
         {
             for (int i = 0; i < _capacity; i++)
             {
-                CarPart newCarPart = new CarPart(random.Next(MinimalPartIndex, MaximalPartIndex));
+                CarPart newCarPart = Factory.CreateNewPart();
 
                 AddPart(newCarPart.Number);
             }
         }
-
-        public int MinimalPartIndex { get; private set; } = 1;
-        public int MaximalPartIndex { get; private set; } = 25;
 
         public void RemovePart(int partNumber)
         {
@@ -332,7 +324,7 @@ namespace HomeWork
 
         public void AddPart(int partNumber)
         {
-            _parts.Add(new CarPart(partNumber));
+            _parts.Add(Factory.CreateNewPart(partNumber));
             PartsCount = _parts.Count;
         }
 
@@ -352,9 +344,9 @@ namespace HomeWork
     {
         private CarPart _breackdown;
 
-        public Car(int partIndex)
+        public Car()
         {
-            _breackdown = new CarPart(partIndex);
+            _breackdown = Factory.CreateNewPart();
         }
 
         public void RemoveBreackDown()
@@ -372,13 +364,13 @@ namespace HomeWork
     {
         private Car _car;
 
-        public Client(Random random, int minimalPartIndex, int maximalPartIndex)
+        public Client()
         {
             int minimalMoney = 5000;
             int maximalMoney = 15000;
 
-            _car = new Car(random.Next(minimalPartIndex, maximalPartIndex));
-            Money = random.Next(minimalMoney, maximalMoney);
+            _car = new Car();
+            Money = Randomizer.RandomNumber(minimalMoney, maximalMoney);
         }
 
         public int Money { get; private set; }
@@ -416,5 +408,33 @@ namespace HomeWork
         public int PriceRate { get; private set; } = 500;
         public int Price { get; private set; }
         public int Number { get; private set; }
+    }
+
+    class Randomizer
+    {
+        private static Random _random = new Random();
+
+        public static int RandomNumber(int minimal, int maximal)
+        {
+            return _random.Next(minimal, maximal);
+        }
+    }
+
+    class Factory
+    {
+        private static int _minimalPartNumber = 1;
+        private static int _maximalPartNumber = 25;
+
+        public static CarPart CreateNewPart(int partNumber = 0)
+        {
+            if (partNumber == 0)
+            {
+                return new CarPart(Randomizer.RandomNumber(_minimalPartNumber, _maximalPartNumber));
+            }
+            else
+            {
+                return new CarPart(partNumber);
+            }
+        } 
     }
 }
