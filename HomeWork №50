@@ -370,7 +370,7 @@ namespace HomeWork
             int maximalMoney = 15000;
 
             _car = new Car();
-            Money = Randomizer.RandomNumber(minimalMoney, maximalMoney);
+            Money = Randomizer.GetRandomNumber(minimalMoney, maximalMoney);
         }
 
         public int Money { get; private set; }
@@ -414,7 +414,7 @@ namespace HomeWork
     {
         private static Random _random = new Random();
 
-        public static int RandomNumber(int minimal, int maximal)
+        public static int GetRandomNumber(int minimal, int maximal)
         {
             return _random.Next(minimal, maximal);
         }
@@ -429,7 +429,7 @@ namespace HomeWork
         {
             if (partNumber == 0)
             {
-                return new CarPart(Randomizer.RandomNumber(_minimalPartNumber, _maximalPartNumber));
+                return new CarPart(Randomizer.GetRandomNumber(_minimalPartNumber, _maximalPartNumber));
             }
             else
             {
