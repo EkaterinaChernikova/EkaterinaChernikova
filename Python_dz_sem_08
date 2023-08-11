@@ -1,0 +1,84 @@
+def initial_notes():
+    with open('phonebook.txt', 'a', encoding='UTF-8') as data:
+        data.write('Иванов Иван Иванович 111111\n')
+        data.write('Петров Петр Петрович 222222\n')
+        data.write('Александров Александр Александрович 333333\n')
+
+def add_note():
+    surname = input('Введите фамилию: ')
+    name = input('Введите имя: ')
+    patronymic = input('Введите отчество: ')
+    phone_number = input('Введите номер телефона: ')
+
+    while not phone_number.isdigit():
+        phone_number = input('Введите номер телефона: ')
+    str = f'\n{surname} {name} {patronymic} {phone_number}'
+    with open('phonebook.txt', 'a', encoding='UTF-8') as data:
+        data.write(str)
+
+def find_note(str):
+    with open('phonebook.txt', 'r', encoding='UTF-8') as data:
+        for line in data:
+            if str.lower() in line.lower().split():
+                print(line, end = '')
+
+def delete_note(str):
+    lst = []
+    with open('phonebook.txt', 'r', encoding='UTF-8') as data:
+        lst = data.readlines()
+        for line in range(len(lst)):
+            if str.lower() in lst[line].lower().split():
+                lst[line] = ''
+    with open('phonebook.txt', 'w', encoding='UTF-8') as data:
+        for i in lst:
+            data.write(i)
+
+def change_note(str):
+    lst = []
+    with open('phonebook.txt', 'r', encoding='UTF-8') as data:
+        lst = data.readlines()
+        for line in range(len(lst)):
+            if str.lower() in lst[line].lower().split():
+                print('Запись найдена')
+                
+                if input('Изменить фамилию? Y/N: ').upper() == 'Y':
+                    surname = input('Введите фамилию: ')
+                else: surname = lst[line].split()[0]
+
+                if input('Изменить имя? Y/N: ').upper() == 'Y':
+                    name = input('Введите имя: ')
+                else: name = lst[line].split()[1]
+
+                if input('Изменить отчество? Y/N: ').upper() == 'Y':
+                    patronymic = input('Введите отчество: ')
+                else: patronymic = lst[line].split()[2]
+
+                if input('Изменить номер? Y/N: ').upper() == 'Y':
+                    phone_number = input('Введите номер телефона: ')
+                else: phone_number = lst[line].split()[3]
+
+                while not phone_number.isdigit():
+                    phone_number = input('Введите номер телефона: ')
+                lst[line] = f'{surname} {name} {patronymic} {phone_number}\n'
+                with open('phonebook.txt', 'w', encoding='UTF-8') as data:
+                    for i in lst:
+                        data.write(i)
+                break
+
+while True:
+    com = input('\nadd, all, find, del, change, stop: ')
+    if com.lower() == 'stop':
+        break
+    if com.lower() == 'add':
+        add_note()
+    if com.lower() == 'find':
+        str = input('Что ищете? ')
+        find_note(str)
+    if com.lower() == 'all':
+        find_note('')
+    if com.lower() == 'del':
+        str = input('Что ищете? ')
+        delete_note(str)
+    if com.lower() == 'change':
+        str = input('Что меняем? ')
+        change_note(str)
