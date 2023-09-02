@@ -1,0 +1,22 @@
+import random
+import pandas as pd
+from numpy import array
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
+
+lst = ['robot'] * 10
+lst += ['human'] * 10
+random.shuffle(lst)
+data = pd.DataFrame({f'whoAmI{lst}'})
+data.head()
+print(lst)
+
+list_1 = array(lst)
+label_encoder = LabelEncoder()
+int_encoded = label_encoder.fit_transform(list_1)
+print(int_encoded)
+
+one_hot_encoder = OneHotEncoder(sparse_output=False)
+int_encoded = int_encoded.reshape(len(int_encoded), 1)
+one_hot_encoded = one_hot_encoder.fit_transform(int_encoded)
+print(one_hot_encoded)
