@@ -6,13 +6,13 @@ namespace HomeWork
     {
         static void Main(string[] args)
         {
-            int paintings = 52;
-            int rowsOfPaintings = 3;
+            int imagesCount = 52;
+            int imagesInOneRow = 3;
 
-            int filledRowsOfPaintings = paintings / rowsOfPaintings;
-            int remains = paintings % rowsOfPaintings;
+            int fullRows = imagesCount / imagesInOneRow;
+            int remainImages = imagesCount % imagesInOneRow;
 
-            Console.WriteLine($"Кол-во заполненных рядов: {filledRowsOfPaintings}\n" + $"Кол-во картинок сверх меры: {remains}");
+            Console.WriteLine($"Кол-во заполненных рядов: {fullRows}\n" + $"Кол-во картинок сверх меры: {remainImages}");
             Console.ReadKey();
         }
     }
